@@ -1,0 +1,15 @@
+{% extends "layout.html" %}
+{% block content %}
+<h1>Create your account</h1>
+<form action="/" method="post" class="w3-container w3-card-4 w3-grey">
+    <div class="container">
+        <label for="username"><b>Username</b></label>
+        <input type="text" placeholder="Enter Username" name="username" class="w3-input" required>
+
+        <label for="password"><b>Password</b></label>
+        <input type="password" placeholder="Enter Password" name="password" class="w3-input" required>
+
+        <button type="submit" class="w3-button w3-dark-grey">Sign Up</button>
+    </div>
+</form>
+{% endblock %}
