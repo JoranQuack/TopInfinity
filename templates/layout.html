@@ -12,11 +12,8 @@
 <body>
     <div class="w3-bar w3-card-4 w3-light-grey">
         <a href="{{url_for('home')}}" class="w3-bar-item w3-button">Home</a>
-        {% if signedIn == True %}
         <a href="{{url_for('account')}}" class="w3-bar-item w3-button">Account</a>
-        {% else: %}
-        <a href="{{url_for('signin')}}" class="w3-bar-item w3-button">Sign In</a>
-        {% endif %}
+        <a href="{{url_for('signin')}}" class="w3-bar-item w3-button">Sign In</a>   
     </div> 
     {% block content %} 
     {% endblock %}
