@@ -21,6 +21,7 @@
             <input type="password" placeholder="Enter Password" name="password" class="w3-input" required>
 
             <button type="submit" class="w3-button w3-dark-grey">Sign In</button>
+            <p style="color: red;">{{errorMessage}}</p>
             <p>Don't have an account?</p>
             <a href="{{url_for('signup')}}" class="w3-button w3-dark-grey">Sign Up</a>
         </div>

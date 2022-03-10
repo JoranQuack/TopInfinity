@@ -12,10 +12,10 @@
 <body>
     <div class="w3-bar w3-card-4 w3-light-grey">
         <a href="{{url_for('home')}}" class="w3-bar-item w3-button">Home</a>
-        <a href="{{url_for('account')}}" class="w3-bar-item w3-button">Account</a>
-        <a href="{{url_for('signin')}}" class="w3-bar-item w3-button">Sign In</a>   
-    </div> 
-    {% block content %} 
+        <a href="{{url_for('account')}}"><img src="{{userData[0][3]}}" class="w3-bar-item w3-button"
+            style="margin-left: 1150px; width: 50px; height: 35px;"></img></a>
+    </div>
+    {% block content %}
     {% endblock %}
 </body>
 
