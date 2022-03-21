@@ -1,13 +1,24 @@
-from flask import Flask, render_template, g, request, redirect, url_for, session
+from flask import Flask, render_template, g, request, redirect, url_for, session, flash
+from werkzeug.utils import secure_filename
+from PIL import Image, ImageDraw, ImageFilter
 import sqlite3
-import time
 import hashlib
+import glob
+import cv2
+import os
 
+UPLOAD_FOLDER = 'static/pfps/'
+ALLOWED_EXTENSIONS = set(['png', 'jpg', 'jpeg', 'gif'])
 DATABASE = "users.db"
 
 app = Flask(__name__)
-
 app.secret_key = 'mysecretkey'
+app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024
+
+
+def allowed_file(filename):
+    return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
 
 def get_db():
@@ -45,8 +56,9 @@ def home():
                 sql = "SELECT * FROM users WHERE username = ?"
                 cursor.execute(sql, (session['username'], ))
                 results = cursor.fetchall()
-                print(results[0][3])
-                return render_template('home.html', userData=results)
+                session['pfp'] = results[0][3]
+                print(session['pfp'])
+                return render_template('home.html')
             else:
                 errorMessage = "Incorrect password, please try again."
                 return render_template('signin.html', errorMessage=errorMessage)
@@ -72,13 +84,13 @@ def home_post():
         results[i] = results[i][0]
     if username not in results:
         cursor = get_db().cursor()
-        sql = "INSERT INTO users(username,password, pfp) VALUES(?,?,?)"
+        sql = "INSERT INTO users(username,password,pfp) VALUES(?,?,?)"
         cursor.execute(sql, (username, password, "/static/pfps/default.png"))
         get_db().commit()
         session['username'] = username
         session['password'] = password
         return redirect(url_for('home'))
-    else: 
+    else:
         errorMessage = "Username is already in use, please choose something else."
         return render_template('signup.html', errorMessage=errorMessage)
 
@@ -95,6 +107,35 @@ def account():
     cursor.execute(sql)
     results = cursor.fetchall()
     return render_template('account.html', results=results)
+
+
+@app.route('/pfp', methods=['POST'])
+def upload_image():
+    if 'file' not in request.files:
+        flash('No file part')
+        return redirect(request.url)
+    file = request.files['file']
+    if file.filename == '':
+        flash('No image selected for uploading')
+        return redirect(request.url)
+    if file and allowed_file(file.filename):
+        filename = secure_filename(file.filename)
+        file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+        session['pfp'] = f"static/pfps/{filename}"
+        cursor = get_db().cursor()
+        sql = "UPDATE users SET pfp = ? WHERE username = ?"
+        cursor.execute(sql, (session['pfp'], session['username'], ))
+        get_db().commit()
+        return render_template('home.html')
+    else:
+        flash('Allowed image types are -> png, jpg, jpeg, gif')
+        return redirect(request.url)
+
+
+@app.route('/display/<filename>')
+def display_image(filename):
+    #print('display_image filename: ' + filename)
+    return redirect(url_for('static', filename='uploads/' + filename), code=301)
 
 
 @app.route("/signin", methods=['GET', 'POST'])
