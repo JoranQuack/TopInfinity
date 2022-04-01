@@ -1,31 +1,32 @@
 {% extends "layout.html" %}
 {% block content %}
-<a href="{{url_for('logout')}}" class="w3-button w3-dark-grey">Log Out</a>
-<h2>Select a file to upload</h2>
+<img src="{{session['pfp']}}"
+	style="margin-top: 15px; object-fit: cover; border-radius: 1000px; width: 10vw; height: 10vw; padding: 3px; margin-left: 45vw;"></img>
+<br>
+<h1 style="text-align: center;">Hi there, {{session['username']}}</h1>
+<a href="{{url_for('logout')}}" class="w3-button w3-dark-grey" style="width: 10vw; margin-left: 45vw;">Log Out</a>
+<h2>Upload a New Profile Picture</h2>
 <p>
 	{% with messages = get_flashed_messages() %}
-	  {% if messages %}
-		<ul>
-		{% for message in messages %}
-		  <li>{{ message }}</li>
-		{% endfor %}
-		</ul>
-	  {% endif %}
-	{% endwith %}
+	{% if messages %}
+<ul>
+	{% for message in messages %}
+	<li>{{ message }}</li>
+	{% endfor %}
+</ul>
+{% endif %}
+{% endwith %}
 </p>
 {% if filename %}
-	<div>
-		<img src="{{ url_for('display_image', filename=filename) }}">
-	</div>
+<div>
+	<img src="{{ url_for('display_image', filename=filename) }}">
+</div>
 {% endif %}
 <form method="post" action="/pfp" enctype="multipart/form-data">
-    <dl>
+	<dl>
 		<p>
-			<input type="file" name="file" autocomplete="off" required>
+			<input type="file" name="file" onchange="form.submit()" accept=".png, .jpg, .jpeg, .gif" required>
 		</p>
-    </dl>
-    <p>
-		<input type="submit" value="Submit">
-	</p>
+	</dl>
 </form>
 {% endblock %}

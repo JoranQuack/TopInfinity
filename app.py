@@ -3,14 +3,14 @@ from werkzeug.utils import secure_filename
 from PIL import Image, ImageDraw, ImageFilter
 import sqlite3
 import hashlib
-import glob
-import cv2
 import os
+import re
 
 UPLOAD_FOLDER = 'static/pfps/'
 ALLOWED_EXTENSIONS = set(['png', 'jpg', 'jpeg', 'gif'])
 DATABASE = "users.db"
 
+regex = '^[a-z0-9]+[\._]?[a-z0-9]+[@]\w+[.]\w+{2,3}$' 
 app = Flask(__name__)
 app.secret_key = 'mysecretkey'
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
@@ -57,7 +57,6 @@ def home():
                 cursor.execute(sql, (session['username'], ))
                 results = cursor.fetchall()
                 session['pfp'] = results[0][3]
-                print(session['pfp'])
                 return render_template('home.html')
             else:
                 errorMessage = "Incorrect password, please try again."
@@ -74,6 +73,7 @@ def home():
 def home_post():
     username = request.form['username']
     password = request.form['password']
+    email = request.form['email']
     h = hashlib.md5(password.encode())
     password = h.hexdigest()
     cursor = get_db().cursor()
@@ -84,12 +84,27 @@ def home_post():
         results[i] = results[i][0]
     if username not in results:
         cursor = get_db().cursor()
-        sql = "INSERT INTO users(username,password,pfp) VALUES(?,?,?)"
-        cursor.execute(sql, (username, password, "/static/pfps/default.png"))
-        get_db().commit()
-        session['username'] = username
-        session['password'] = password
-        return redirect(url_for('home'))
+        sql = "SELECT email FROM users"
+        cursor.execute(sql)
+        results = cursor.fetchall()
+        for i in range(len(results)):
+            results[i] = results[i][0]
+        if email not in results:
+            if (re.search(regex,email)):
+                cursor = get_db().cursor()
+                sql = "INSERT INTO users(username,password,pfp, email) VALUES(?,?,?, ?)"
+                cursor.execute(sql, (username, password, "/static/pfps/default.png", email))
+                get_db().commit()
+                session['username'] = username
+                session['password'] = password
+                session['email'] = email
+                return redirect(url_for('home'))
+            else:
+                errorMessage = "Email is invalid."
+                return render_template('signup.html', errorMessage=errorMessage)
+        else:
+            errorMessage = "Email is already in use."
+            return render_template('signup.html', errorMessage=errorMessage)
     else:
         errorMessage = "Username is already in use, please choose something else."
         return render_template('signup.html', errorMessage=errorMessage)
@@ -113,11 +128,9 @@ def account():
 def upload_image():
     if 'file' not in request.files:
         flash('No file part')
-        return redirect(request.url)
     file = request.files['file']
     if file.filename == '':
         flash('No image selected for uploading')
-        return redirect(request.url)
     if file and allowed_file(file.filename):
         filename = secure_filename(file.filename)
         file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
@@ -128,8 +141,7 @@ def upload_image():
         get_db().commit()
         return render_template('home.html')
     else:
-        flash('Allowed image types are -> png, jpg, jpeg, gif')
-        return redirect(request.url)
+        flash('Allowed image types are: png, jpg, jpeg, gif')
 
 
 @app.route('/display/<filename>')

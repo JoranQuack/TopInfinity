@@ -19,9 +19,15 @@
 
             <label for="password"><b>Password</b></label>
             <input type="password" placeholder="Enter Password" name="password" class="w3-input" required>
+
+            <label for="email"><b>Email</b></label>
+            <input type="text" placeholder="Enter Email" name="email" class="w3-input" required>
+
             <button type="submit" class="w3-button w3-dark-grey">Sign Up</button>
+
             <p style="color: red;">{{errorMessage}}</p>
             <p>Already have an account?</p>
+
             <a href="{{url_for('signin')}}" class="w3-button w3-dark-grey">Sign In</a>
         </div>
     </form>
