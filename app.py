@@ -10,7 +10,7 @@ UPLOAD_FOLDER = 'static/pfps/'
 ALLOWED_EXTENSIONS = set(['png', 'jpg', 'jpeg', 'gif'])
 DATABASE = "users.db"
 
-regex = '^[a-z0-9]+[\._]?[a-z0-9]+[@]\w+[.]\w+{2,3}$' 
+regex = '(^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$)'
 app = Flask(__name__)
 app.secret_key = 'mysecretkey'
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
@@ -57,6 +57,7 @@ def home():
                 cursor.execute(sql, (session['username'], ))
                 results = cursor.fetchall()
                 session['pfp'] = results[0][3]
+                session['userid'] = results[0][0]
                 return render_template('home.html')
             else:
                 errorMessage = "Incorrect password, please try again."
@@ -90,10 +91,11 @@ def home_post():
         for i in range(len(results)):
             results[i] = results[i][0]
         if email not in results:
-            if (re.search(regex,email)):
+            if (re.search(regex, email)):
                 cursor = get_db().cursor()
-                sql = "INSERT INTO users(username,password,pfp, email) VALUES(?,?,?, ?)"
-                cursor.execute(sql, (username, password, "/static/pfps/default.png", email))
+                sql = "INSERT INTO users(username,password,pfp, email) VALUES(?,?,?,?)"
+                cursor.execute(
+                    sql, (username, password, "/static/pfps/default.png", email))
                 get_db().commit()
                 session['username'] = username
                 session['password'] = password
@@ -139,24 +141,18 @@ def upload_image():
         sql = "UPDATE users SET pfp = ? WHERE username = ?"
         cursor.execute(sql, (session['pfp'], session['username'], ))
         get_db().commit()
-        return render_template('home.html')
+        return render_template('account.html')
     else:
         flash('Allowed image types are: png, jpg, jpeg, gif')
-
-
-@app.route('/display/<filename>')
-def display_image(filename):
-    #print('display_image filename: ' + filename)
-    return redirect(url_for('static', filename='uploads/' + filename), code=301)
 
 
 @app.route("/signin", methods=['GET', 'POST'])
 def signin():
     if request.method == 'POST':
-        session['username'] = request.form['username']
         password = request.form['password']
         h = hashlib.md5(password.encode())
         session['password'] = h.hexdigest()
+        session['username'] = request.form['username']
         return redirect(url_for('home'))
     return render_template('signin.html')
 
@@ -164,7 +160,21 @@ def signin():
 @app.route('/logout')
 def logout():
     # remove the username from the session if it's there
-    session.pop('username', None)
+    session.clear()
+    return redirect(url_for('home'))
+
+@app.route('/confirm')
+def confirm():
+    return render_template('confirm.html')
+
+
+@app.route('/deleteacc')
+def deleteacc():
+    cursor = get_db().cursor()
+    sql = "DELETE FROM users WHERE id=?"
+    cursor.execute(sql, (session['userid'], ))
+    get_db().commit()
+    session.clear()
     return redirect(url_for('home'))
 
 
