@@ -1,0 +1,15 @@
+{% extends "layout.html" %}
+{% block content %}
+
+<h1>Enter Topic Details</h1>
+<form action="/addtopic" method="post">
+    <label for="title"><b>Topic Title</b></label>
+    <input type="text" placeholder="Enter Title" name="title" class="small-field" required>
+
+    <label for="description"><b>Topic Description</b></label>
+    <input type="text" placeholder="Enter Description" name="description" class="big-field" required>
+
+    <button type="submit" class="">Create Topic</button>
+</form>
+
+{% endblock %}

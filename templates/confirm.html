@@ -8,11 +8,11 @@
 </head>
 
 <body>
-    <p>Are you sure you want to delete your account?</p>
-    <p style="color: red;">This action cannot be undone.</p>
-    <a href="{{url_for('deleteacc')}}">Delete Account</a>
+    <p>{{confirmMessage}}</p>
+    <p class="important">This action cannot be undone.</p>
+    <a href="{{url_for(confirmFunction, confirmed=True)}}">{{confirmAction}}</a>
     <br>
-    <a href="{{url_for('home')}}">Cancel</a>
+    <a href="{{url_for('checkcreds')}}">Cancel</a>
 </body>
 
 </html>

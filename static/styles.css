@@ -1,0 +1,141 @@
+@font-face {
+    font-family: DosisRegular;
+    src: url(/static/websitecomponents/dosis-font/Dosis-Regular.ttf);
+}
+
+body {
+    margin: 1vw;
+}
+
+a, p, h1, h2, li, b, label {
+    font-family: DosisRegular;
+    font-size: 1.3vw;
+}
+
+h1 {
+    font-size: 2.2vw;
+    margin-left: 1vw;
+}
+
+h2 {
+    font-size: 1.8vw;
+}
+
+form {
+    margin: 2vw;
+}
+
+.input-description {
+    size: 50;
+
+}
+
+.pfp {
+    object-fit: cover;
+    border-radius: 1000px;
+    height: 3.5vw;
+    width: 3.5vw;
+}
+
+.bar-pfp {
+    margin: 0.6vw
+}
+
+.centered-pfp {
+    margin-top: 0.8vw;
+    width: 10vw;
+    height: 10vw;
+    margin-left: 45vw;
+}
+
+.profile {
+    display: flex;
+    justify-content: flex-start;
+}
+
+.profile-pfp {
+    width: 3vw;
+    height: 3vw;
+}
+
+.bar {
+    display: flex;
+    justify-content: space-between;
+    background-color: rgb(150, 150, 150);
+    border-radius: 100px;
+    height: 60px;
+    margin: 0.5vw;
+}
+
+.bar-item {
+    text-decoration: none;
+    color: black;
+    font-size: 2vw;
+    margin: 1vw;
+    margin-left: 1.5vw;
+}
+
+.topic-box {
+    background-color: rgb(150, 150, 150);
+    padding: 1vw;
+    margin-bottom: 1.5vw;
+    margin-left: 0.5vw;
+    margin-right: 0.5vw;
+    border-radius: 20px;
+}
+
+.important {
+    color: red;
+}
+
+.topics-header {
+    display: flex;
+    justify-content: space-between;
+}
+
+.add-button {
+    font-weight: bold;
+    padding: 1vw;
+    height: fit-content;
+    width: fit-content;
+    margin-right: 0.5vw;
+    margin-top: 1vw;
+    background-color: rgb(150, 150, 150);
+    border-radius: 1000px;
+    text-decoration: none;
+    color: black;
+}
+
+.add-text {
+    font-size: 4vw;
+}
+
+.topic-text {
+    margin-top: 0;
+    margin-left: 0.5vw
+}
+
+.profile-pfp {
+    margin-left: 0.5vw;
+}
+
+.box-top {
+    margin: 0;
+    margin-top: 0vw;
+    display: flex;
+    justify-content: space-between;
+}
+
+.button-icon {
+    margin: 0;
+    height: 2vw;
+}
+
+.description {
+    margin-top: 0;
+}
+
+.title {
+    margin-top: 0.5vw;
+    margin-bottom: 0.5vw;
+}

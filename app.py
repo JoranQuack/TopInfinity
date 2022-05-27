@@ -8,10 +8,10 @@ import re
 
 UPLOAD_FOLDER = 'static/pfps/'
 ALLOWED_EXTENSIONS = set(['png', 'jpg', 'jpeg', 'gif'])
-DATABASE = "users.db"
+DATABASE = "topinfinity.db"
 
 regex = '(^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$)'
-app = Flask(__name__)
+app = Flask(__name__, template_folder="templates")
 app.secret_key = 'mysecretkey'
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024
@@ -35,8 +35,17 @@ def close_connection(exception):
         db.close()
 
 
-@app.get("/")
+@app.route("/")
 def home():
+    cursor = get_db().cursor()
+    sql = "SELECT topics.title, topics.description, users.username, users.pfp, topics.id FROM topics JOIN users ON topics.userid = users.id"
+    cursor.execute(sql)
+    topics = cursor.fetchall()
+    return render_template('home.html', topics=topics)
+
+
+@app.get("/checkcreds")
+def checkcreds():
     if 'username' in session:
         cursor = get_db().cursor()
         sql = "SELECT username FROM users"
@@ -56,9 +65,10 @@ def home():
                 sql = "SELECT * FROM users WHERE username = ?"
                 cursor.execute(sql, (session['username'], ))
                 results = cursor.fetchall()
+                session['email'] = results[0][4]
                 session['pfp'] = results[0][3]
                 session['userid'] = results[0][0]
-                return render_template('home.html')
+                return redirect(url_for('home'))
             else:
                 errorMessage = "Incorrect password, please try again."
                 return render_template('signin.html', errorMessage=errorMessage)
@@ -67,7 +77,7 @@ def home():
             return render_template('signin.html', errorMessage=errorMessage)
     else:
         errorMessage = "You are not logged in."
-        return render_template('error.html', errorMessage=errorMessage)
+        return render_template('welcome.html', errorMessage=errorMessage)
 
 
 @app.post('/')
@@ -100,7 +110,7 @@ def home_post():
                 session['username'] = username
                 session['password'] = password
                 session['email'] = email
-                return redirect(url_for('home'))
+                return redirect(url_for('checkcreds'))
             else:
                 errorMessage = "Email is invalid."
                 return render_template('signup.html', errorMessage=errorMessage)
@@ -153,7 +163,7 @@ def signin():
         h = hashlib.md5(password.encode())
         session['password'] = h.hexdigest()
         session['username'] = request.form['username']
-        return redirect(url_for('home'))
+        return redirect(url_for('checkcreds'))
     return render_template('signin.html')
 
 
@@ -161,22 +171,78 @@ def signin():
 def logout():
     # remove the username from the session if it's there
     session.clear()
+    return redirect(url_for('checkcreds'))
+
+
+@app.get('/deleteacc/<confirmed>')
+def deleteacc(confirmed):
+    if confirmed == "True":
+        cursor = get_db().cursor()
+        sql = "DELETE FROM users WHERE id=?"
+        cursor.execute(sql, (session['userid'], ))
+        get_db().commit()
+        session.clear()
+        return redirect(url_for('checkcreds'))
+    else:
+        confirmMessage = "Are you sure you would like to delete your account?"
+        confirmAction = "Delete Account"
+        confirmFunction = "deleteacc"
+        return render_template('confirm.html', confirmMessage=confirmMessage, confirmAction=confirmAction, confirmFunction=confirmFunction)
+
+
+@app.get('/deletetopic/<confirmed>')
+def deletetopic(confirmed):
+    if confirmed == "True":
+        print(confirmed)
+        cursor = get_db().cursor()
+        sql = "DELETE FROM topics WHERE id=?"
+        cursor.execute(sql, (session['topicid'], ))
+        get_db().commit()
+        return redirect(url_for('checkcreds'))
+    else:
+        confirmMessage = "Are you sure you would like to delete this topic and all of its items?"
+        confirmAction = "Delete Topic"
+        confirmFunction = "deletetopic"
+        return render_template('confirm.html', confirmMessage=confirmMessage, confirmAction=confirmAction, confirmFunction=confirmFunction)
+
+
+@app.get('/addtopic')
+def addtopic():
+    return render_template('addtopic.html')
+
+
+@app.post('/addtopic')
+def addtopic_post():
+    title = request.form['title'].capitalize()
+    description = request.form['description']
+    cursor = get_db().cursor()
+    sql = "INSERT INTO topics(userid, title, description) VALUES(?,?,?)"
+    cursor.execute(sql, (session['userid'], title, description))
+    get_db().commit()
     return redirect(url_for('home'))
 
-@app.route('/confirm')
-def confirm():
-    return render_template('confirm.html')
 
-
-@app.route('/deleteacc')
-def deleteacc():
+@app.get('/edittopic/<int:topicid>')
+def edittopic(topicid):
+    session['topicid'] = topicid
     cursor = get_db().cursor()
-    sql = "DELETE FROM users WHERE id=?"
-    cursor.execute(sql, (session['userid'], ))
+    sql = "SELECT * FROM topics WHERE id = ?"
+    cursor.execute(sql, (topicid, ))
+    results = cursor.fetchall()
+    return render_template('edittopic.html', topics=results)
+
+
+@app.post('/edittopic')
+def edittopic_post():
+    title = request.form['title']
+    description = request.form['description']
+    cursor = get_db().cursor()
+    sql = "UPDATE topics SET title = ?, description = ?  WHERE id = ?"
+    cursor.execute(sql, (title, description, session['topicid']))
     get_db().commit()
-    session.clear()
     return redirect(url_for('home'))
 
 
 if __name__ == "__main__":
     app.run(debug=True)
+

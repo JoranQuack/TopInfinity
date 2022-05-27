@@ -1,7 +1,6 @@
 {% extends "layout.html" %}
 {% block content %}
-<img src="{{session['pfp']}}"
-	style="margin-top: 15px; object-fit: cover; border-radius: 1000px; width: 10vw; height: 10vw; padding: 3px; margin-left: 45vw;"></img>
+<img src="{{session['pfp']}}" class="centered-pfp pfp"></img>
 <br>
 <h1 style="text-align: center;">Hi there, {{session['username']}}</h1>
 <p style="text-align: center;">Email: {{session['email']}}</p>
@@ -30,6 +29,6 @@
 		</p>
 	</dl>
 </form>
-<a href="{{url_for('confirm')}}" style="color: red;">Delete Account</a>
+<a href="{{url_for('deleteacc', confirmed='False')}}" class="important">Delete Account</a>
 
 {% endblock %}

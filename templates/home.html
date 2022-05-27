@@ -1,4 +1,27 @@
 {% extends "layout.html" %}
 {% block content %}
-<h1>all the blog stuff will go here:</h1>
+<div class="topics-header">
+    <h1>Topics</h1>
+    <a href="{{url_for('addtopic')}}" class="add-button">ADD TOPIC</a>
+</div>
+
+{%for item in topics%}
+<div class="topic-box">
+    <div class="topic-text">
+        <div class="box-top">
+            <h2 class="title">{{item[0]}}</h2>
+            {%if item[2] == session['username']:%}
+            <a class="button-icon" href="{{url_for('edittopic', topicid=item[4])}}">
+                <img class="button-icon" src="/static/websitecomponents/icon-edit.png">
+            </a>
+            {%endif%}
+        </div>
+        <p class="description">{{item[1]}}</p>
+    </div>
+    <div class="profile">
+        <img class="pfp profile-pfp" src="{{item[3]}}">
+        <p class="topic-text">{{item[2]}}</p>
+    </div>
+</div>
+{%endfor%}
 {% endblock %}

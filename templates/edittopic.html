@@ -1,0 +1,17 @@
+{% extends "layout.html" %}
+{% block content %}
+
+<form action="/edittopic" method="post">
+    <label for="title">New Title</label>
+    <input type="text" value="{{topics[0][2]}}" name="title">
+
+    <label for="description">New Description</label>
+    <input type="text" value="{{topics[0][3]}}" size="50" name="description" class="input-description">
+
+    <button type="submit">Update Topic</button>
+    <p class="important">{{errorMessage}}</p>
+</form>
+
+<a href="{{url_for('deletetopic', confirmed='False')}}">Delete Topic</a>
+
+{% endblock %}
