@@ -7,9 +7,10 @@
     <input type="text" placeholder="Enter Title" name="title" class="small-field" required>
 
     <label for="description"><b>Topic Description</b></label>
-    <input type="text" placeholder="Enter Description" name="description" class="big-field" required>
+    <input type="text" placeholder="Enter Description" name="description" class="big-field" rows="10" required>
 
     <button type="submit" class="">Create Topic</button>
 </form>
+<p class="important">{{error}}</p>
 
 {% endblock %}

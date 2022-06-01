@@ -15,6 +15,7 @@ app = Flask(__name__, template_folder="templates")
 app.secret_key = 'mysecretkey'
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024
+app.config['UPLOAD_EXTENSIONS'] = ['.jpeg', '.jpg', '.png', '.gif']
 
 
 def allowed_file(filename):
@@ -35,6 +36,22 @@ def close_connection(exception):
         db.close()
 
 
+def list_items(results):
+    for i in range(len(results)):
+        results[i] = results[i][0]
+    return results
+
+
+def topic_check(title, description):
+    if title.replace(' ','').isalpha() == False:
+        errorMessage = "Title must only include letters"
+    elif description.replace(' ','').isalpha() == False:
+        errorMessage = "Description must only include letters"
+    else:
+        errorMessage = "none"
+    return errorMessage
+
+
 @app.route("/")
 def home():
     cursor = get_db().cursor()
@@ -51,15 +68,13 @@ def checkcreds():
         sql = "SELECT username FROM users"
         cursor.execute(sql)
         results = cursor.fetchall()
-        for i in range(len(results)):
-            results[i] = results[i][0]
+        list_items(results)
         if session['username'] in results:
             cursor = get_db().cursor()
             sql = "SELECT password FROM users"
             cursor.execute(sql)
             results = cursor.fetchall()
-            for i in range(len(results)):
-                results[i] = results[i][0]
+            list_items(results)
             if session['password'] in results:
                 cursor = get_db().cursor()
                 sql = "SELECT * FROM users WHERE username = ?"
@@ -71,17 +86,17 @@ def checkcreds():
                 return redirect(url_for('home'))
             else:
                 errorMessage = "Incorrect password, please try again."
-                return render_template('signin.html', errorMessage=errorMessage)
+                return render_template('signin.html', error=errorMessage)
         else:
             errorMessage = "Username does not exist."
-            return render_template('signin.html', errorMessage=errorMessage)
+            return render_template('signin.html', error=errorMessage)
     else:
-        errorMessage = "You are not logged in."
-        return render_template('welcome.html', errorMessage=errorMessage)
+        errorMessage = "You are not signed in."
+        return render_template('welcome.html', error=errorMessage)
 
 
-@app.post('/')
-def home_post():
+@app.post('/signup')
+def signup_post():
     username = request.form['username']
     password = request.form['password']
     email = request.form['email']
@@ -91,15 +106,13 @@ def home_post():
     sql = "SELECT username FROM users"
     cursor.execute(sql)
     results = cursor.fetchall()
-    for i in range(len(results)):
-        results[i] = results[i][0]
+    list_items(results)
     if username not in results:
         cursor = get_db().cursor()
         sql = "SELECT email FROM users"
         cursor.execute(sql)
         results = cursor.fetchall()
-        for i in range(len(results)):
-            results[i] = results[i][0]
+        list_items(results)
         if email not in results:
             if (re.search(regex, email)):
                 cursor = get_db().cursor()
@@ -113,16 +126,16 @@ def home_post():
                 return redirect(url_for('checkcreds'))
             else:
                 errorMessage = "Email is invalid."
-                return render_template('signup.html', errorMessage=errorMessage)
+                return render_template('signup.html', error=errorMessage)
         else:
             errorMessage = "Email is already in use."
-            return render_template('signup.html', errorMessage=errorMessage)
+            return render_template('signup.html', error=errorMessage)
     else:
         errorMessage = "Username is already in use, please choose something else."
-        return render_template('signup.html', errorMessage=errorMessage)
+        return render_template('signup.html', error=errorMessage)
 
 
-@app.route("/signup")
+@app.get("/signup")
 def signup():
     return render_template('signup.html')
 
@@ -141,19 +154,19 @@ def upload_image():
     if 'file' not in request.files:
         flash('No file part')
     file = request.files['file']
-    if file.filename == '':
-        flash('No image selected for uploading')
-    if file and allowed_file(file.filename):
-        filename = secure_filename(file.filename)
+    filename = secure_filename(file.filename)
+    if filename != '':
+        file_ext = os.path.splitext(filename)[1]
+        if file_ext not in app.config['UPLOAD_EXTENSIONS']:
+            error = "Allowed image types are: png, jpg, jpeg, gif"
+            return render_template('account.html', error=error)
         file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
-        session['pfp'] = f"static/pfps/{filename}"
-        cursor = get_db().cursor()
-        sql = "UPDATE users SET pfp = ? WHERE username = ?"
-        cursor.execute(sql, (session['pfp'], session['username'], ))
-        get_db().commit()
-        return render_template('account.html')
-    else:
-        flash('Allowed image types are: png, jpg, jpeg, gif')
+    session['pfp'] = f"static/pfps/{filename}"
+    cursor = get_db().cursor()
+    sql = "UPDATE users SET pfp = ? WHERE username = ?"
+    cursor.execute(sql, (session['pfp'], session['username'], ))
+    get_db().commit()
+    return render_template('account.html')
 
 
 @app.route("/signin", methods=['GET', 'POST'])
@@ -184,10 +197,10 @@ def deleteacc(confirmed):
         session.clear()
         return redirect(url_for('checkcreds'))
     else:
-        confirmMessage = "Are you sure you would like to delete your account?"
-        confirmAction = "Delete Account"
-        confirmFunction = "deleteacc"
-        return render_template('confirm.html', confirmMessage=confirmMessage, confirmAction=confirmAction, confirmFunction=confirmFunction)
+        message = "Are you sure you would like to delete your account?"
+        action = "Delete Account"
+        function = "deleteacc"
+        return render_template('confirm.html', message=message, action=action, function=function)
 
 
 @app.get('/deletetopic/<confirmed>')
@@ -200,10 +213,10 @@ def deletetopic(confirmed):
         get_db().commit()
         return redirect(url_for('checkcreds'))
     else:
-        confirmMessage = "Are you sure you would like to delete this topic and all of its items?"
-        confirmAction = "Delete Topic"
-        confirmFunction = "deletetopic"
-        return render_template('confirm.html', confirmMessage=confirmMessage, confirmAction=confirmAction, confirmFunction=confirmFunction)
+        message = "Are you sure you would like to delete this topic and all of its items?"
+        action = "Delete Topic"
+        function = "deletetopic"
+        return render_template('confirm.html', message=message, action=action, function=function)
 
 
 @app.get('/addtopic')
@@ -215,11 +228,15 @@ def addtopic():
 def addtopic_post():
     title = request.form['title'].capitalize()
     description = request.form['description']
-    cursor = get_db().cursor()
-    sql = "INSERT INTO topics(userid, title, description) VALUES(?,?,?)"
-    cursor.execute(sql, (session['userid'], title, description))
-    get_db().commit()
-    return redirect(url_for('home'))
+    error = topic_check(title, description)
+    if error == "none":
+        cursor = get_db().cursor()
+        sql = "INSERT INTO topics(userid, title, description) VALUES(?,?,?)"
+        cursor.execute(sql, (session['userid'], title, description))
+        get_db().commit()
+        return redirect(url_for('home'))
+    else:
+        return render_template('addtopic.html', error=error)
 
 
 @app.get('/edittopic/<int:topicid>')
@@ -234,15 +251,22 @@ def edittopic(topicid):
 
 @app.post('/edittopic')
 def edittopic_post():
-    title = request.form['title']
+    title = request.form['title'].capitalize()
     description = request.form['description']
-    cursor = get_db().cursor()
-    sql = "UPDATE topics SET title = ?, description = ?  WHERE id = ?"
-    cursor.execute(sql, (title, description, session['topicid']))
-    get_db().commit()
-    return redirect(url_for('home'))
+    errorMessage = topic_check(title, description)
+    if errorMessage == "none":
+        cursor = get_db().cursor()
+        sql = "UPDATE topics SET title = ?, description = ?  WHERE id = ?"
+        cursor.execute(sql, (title, description, session['topicid']))
+        get_db().commit()
+        return redirect(url_for('home'))
+    else:
+        cursor = get_db().cursor()
+        sql = "SELECT * FROM topics WHERE id = ?"
+        cursor.execute(sql, (session['topicid'], ))
+        results = cursor.fetchall()
+        return render_template('edittopic.html', topics=results, error=errorMessage)
 
 
 if __name__ == "__main__":
     app.run(debug=True)
-
