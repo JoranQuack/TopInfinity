@@ -19,7 +19,7 @@
         <p class="description">{{item[1]}}</p>
     </div>
     <div class="profile">
-        <img class="pfp profile-pfp" src="{{item[3]}}">
+        <img class="pfp profile-pfp" src="{{url_for('static', filename='pfps/'+item[3])}}">
         <p class="topic-text">{{item[2]}}</p>
     </div>
 </div>

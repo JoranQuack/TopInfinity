@@ -1,18 +1,12 @@
-<html lang="en">
+{% extends "layout.html" %}
+{% block content %}
 
-<head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Confirm</title>
-</head>
 
-<body>
-    <p>{{confirmMessage}}</p>
-    <p class="important">This action cannot be undone.</p>
-    <a href="{{url_for(confirmFunction, confirmed=True)}}">{{confirmAction}}</a>
-    <br>
-    <a href="{{url_for('checkcreds')}}">Cancel</a>
-</body>
+<p>{{message}}</p>
+<p class="important">This action cannot be undone.</p>
+<a href="{{url_for(function, confirmed=True)}}">{{action}}</a>
+<br>
+<a href="{{url_for('checkcreds')}}">Cancel</a>
 
-</html>
+
+{%endblock%}

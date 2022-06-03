@@ -12,7 +12,8 @@
 <body>
     <div class="bar">
         <a href="{{url_for('home')}}" class="bar-item button">TopInfinity</a>
-        <a href="{{url_for('account')}}"><img src="{{session['pfp']}}" class="button bar-pfp pfp"></img></a>
+        <a href="{{url_for('account')}}"><img src="{{url_for('static', filename='pfps/'+session['pfp'])}}"
+                class="button bar-pfp pfp"></img></a>
     </div>
     {% block content %}
     {% endblock %}

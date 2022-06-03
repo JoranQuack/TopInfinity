@@ -43,13 +43,13 @@ def list_items(results):
 
 
 def topic_check(title, description):
-    if title.replace(' ','').isalpha() == False:
-        errorMessage = "Title must only include letters"
-    elif description.replace(' ','').isalpha() == False:
-        errorMessage = "Description must only include letters"
+    if title.replace(' ', '').isalpha() == False:
+        error = "Title must only include letters"
+    elif description.replace(' ', '').isalpha() == False:
+        error = "Description must only include letters"
     else:
-        errorMessage = "none"
-    return errorMessage
+        error = "none"
+    return error
 
 
 @app.route("/")
@@ -85,14 +85,14 @@ def checkcreds():
                 session['userid'] = results[0][0]
                 return redirect(url_for('home'))
             else:
-                errorMessage = "Incorrect password, please try again."
-                return render_template('signin.html', error=errorMessage)
+                error = "Incorrect password, please try again."
+                return render_template('signin.html', error=error)
         else:
-            errorMessage = "Username does not exist."
-            return render_template('signin.html', error=errorMessage)
+            error = "Username does not exist."
+            return render_template('signin.html', error=error)
     else:
-        errorMessage = "You are not signed in."
-        return render_template('welcome.html', error=errorMessage)
+        error = "You are not signed in."
+        return render_template('welcome.html', error=error)
 
 
 @app.post('/signup')
@@ -118,21 +118,21 @@ def signup_post():
                 cursor = get_db().cursor()
                 sql = "INSERT INTO users(username,password,pfp, email) VALUES(?,?,?,?)"
                 cursor.execute(
-                    sql, (username, password, "/static/pfps/default.png", email))
+                    sql, (username, password, "default.png", email))
                 get_db().commit()
                 session['username'] = username
                 session['password'] = password
                 session['email'] = email
                 return redirect(url_for('checkcreds'))
             else:
-                errorMessage = "Email is invalid."
-                return render_template('signup.html', error=errorMessage)
+                error = "Email is invalid."
+                return render_template('signup.html', error=error)
         else:
-            errorMessage = "Email is already in use."
-            return render_template('signup.html', error=errorMessage)
+            error = "Email is already in use."
+            return render_template('signup.html', error=error)
     else:
-        errorMessage = "Username is already in use, please choose something else."
-        return render_template('signup.html', error=errorMessage)
+        error = "Username is already in use, please choose something else."
+        return render_template('signup.html', error=error)
 
 
 @app.get("/signup")
@@ -161,7 +161,7 @@ def upload_image():
             error = "Allowed image types are: png, jpg, jpeg, gif"
             return render_template('account.html', error=error)
         file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
-    session['pfp'] = f"static/pfps/{filename}"
+    session['pfp'] = filename
     cursor = get_db().cursor()
     sql = "UPDATE users SET pfp = ? WHERE username = ?"
     cursor.execute(sql, (session['pfp'], session['username'], ))
@@ -253,8 +253,8 @@ def edittopic(topicid):
 def edittopic_post():
     title = request.form['title'].capitalize()
     description = request.form['description']
-    errorMessage = topic_check(title, description)
-    if errorMessage == "none":
+    error = topic_check(title, description)
+    if error == "none":
         cursor = get_db().cursor()
         sql = "UPDATE topics SET title = ?, description = ?  WHERE id = ?"
         cursor.execute(sql, (title, description, session['topicid']))
@@ -265,7 +265,7 @@ def edittopic_post():
         sql = "SELECT * FROM topics WHERE id = ?"
         cursor.execute(sql, (session['topicid'], ))
         results = cursor.fetchall()
-        return render_template('edittopic.html', topics=results, error=errorMessage)
+        return render_template('edittopic.html', topics=results, error=error)
 
 
 if __name__ == "__main__":

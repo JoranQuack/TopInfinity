@@ -1,6 +1,6 @@
 {% extends "layout.html" %}
 {% block content %}
-<img src="{{session['pfp']}}" class="centered-pfp pfp"></img>
+<img src="{{url_for('static', filename='pfps/'+session['pfp'])}}" class="centered-pfp pfp"></img>
 <br>
 <h1 style="text-align: center;">Hi there, {{session['username']}}</h1>
 <p style="text-align: center;">Email: {{session['email']}}</p>

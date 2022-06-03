@@ -1,31 +1,19 @@
-<!DOCTYPE html>
-<html lang="en">
+{% extends "welcomelayout.html" %}
+{% block content %}
+<h1>Sign in to an existing account</h1>
+<form action="/signin" method="post" class="w3-container w3-card-4 w3-grey">
+    <div class="container">
+        <label for="username"><b>Username</b></label>
+        <input type="text" placeholder="Enter Username" name="username" class="w3-input" required>
 
-<head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
-    <title>Sign In</title>
-</head>
+        <label for="password"><b>Password</b></label>
+        <input type="password" placeholder="Enter Password" name="password" class="w3-input" required>
 
-<body>
-    {% block content %}
-    <h1>Sign in to an existing account</h1>
-    <form action="/signin" method="post" class="w3-container w3-card-4 w3-grey">
-        <div class="container">
-            <label for="username"><b>Username</b></label>
-            <input type="text" placeholder="Enter Username" name="username" class="w3-input" required>
-
-            <label for="password"><b>Password</b></label>
-            <input type="password" placeholder="Enter Password" name="password" class="w3-input" required>
-
-            <button type="submit" class="w3-button w3-dark-grey">Sign In</button>
-            <p class="important">{{error}}</p>
-            <p>Don't have an account?</p>
-            <a href="{{url_for('signup')}}" class="w3-button w3-dark-grey">Sign Up</a>
-        </div>
-    </form>
-    <a href="{{url_for('checkcreds')}}" class="w3-button w3-dark-grey">Cancel</a>
-</body>
+        <button type="submit" class="w3-button w3-dark-grey">Sign In</button>
+        <p class="important">{{error}}</p>
+        <p>Don't have an account?</p>
+        <a href="{{url_for('signup')}}" class="w3-button w3-dark-grey">Sign Up</a>
+    </div>
+</form>
+<a href="{{url_for('checkcreds')}}" class="w3-button w3-dark-grey">Cancel</a>
 {% endblock %}
