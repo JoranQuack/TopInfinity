@@ -12,11 +12,12 @@
             <h2 class="title">{{item[0]}}</h2>
             {%if item[2] == session['username']:%}
             <a class="button-icon" href="{{url_for('edittopic', topicid=item[4])}}">
-                <img class="button-icon" src="/static/websitecomponents/icon-edit.png">
+                <img class="button-icon" src="{{url_for('static', filename='/websitecomponents/icon-edit.png')}}">
             </a>
             {%endif%}
         </div>
         <p class="description">{{item[1]}}</p>
+        <a href="{{url_for('topic', topicid=item[4])}}">View Topic</a>
     </div>
     <div class="profile">
         <img class="pfp profile-pfp" src="{{url_for('static', filename='pfps/'+item[3])}}">

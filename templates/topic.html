@@ -1,0 +1,35 @@
+{% extends "layout.html" %}
+{% block content %}
+
+
+<h1>{{topics[0][0]}}</h1>
+<p>{{topics[0][1]}}</p>
+<img class="pfp profile-pfp" src="{{url_for('static', filename='/pfps/'+topics[0][3])}}">
+<p>{{topics[0][2]}}</p>
+
+{{items}}
+
+<table>
+    {%for item in items:%}
+    <tr class="item-section">
+        <td>
+            <p>{{item[1]}}</p>
+        </td>
+        <td>
+            <form class="ratingform" action="/rate/{{item[0]}}" method="post">
+            <div class="rating">
+                <input onclick="form.submit()" type="radio" name="rating" value="5" id="5"><label for="5">☆</label>
+                <input onclick="form.submit()" type="radio" name="rating" value="4" id="4"><label for="4">☆</label>
+                <input onclick="form.submit()" type="radio" name="rating" value="3" id="3"><label for="3">☆</label>
+                <input onclick="form.submit()" type="radio" name="rating" value="2" id="2"><label for="2">☆</label>
+                <input onclick="form.submit()" type="radio" name="rating" value="1" id="1"><label for="1">☆</label>
+            </div>
+            </form>
+        </td>
+    </tr>
+    {%endfor%}
+</table>
+
+
+
+{%endblock%}

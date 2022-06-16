@@ -117,8 +117,7 @@ def signup_post():
             if (re.search(regex, email)):
                 cursor = get_db().cursor()
                 sql = "INSERT INTO users(username,password,pfp, email) VALUES(?,?,?,?)"
-                cursor.execute(
-                    sql, (username, password, "default.png", email))
+                cursor.execute(sql, (username, password, "default.png", email))
                 get_db().commit()
                 session['username'] = username
                 session['password'] = password
@@ -266,6 +265,40 @@ def edittopic_post():
         cursor.execute(sql, (session['topicid'], ))
         results = cursor.fetchall()
         return render_template('edittopic.html', topics=results, error=error)
+
+
+@app.get('/topic/<int:topicid>')
+def topic(topicid):
+    session['topicid'] = topicid
+    cursor = get_db().cursor()
+    sql = "SELECT topics.title, topics.description, users.username, users.pfp FROM topics JOIN users ON topics.userid = users.id WHERE topics.id = ?"
+    cursor.execute(sql, (topicid, ))
+    topics = cursor.fetchall()
+    cursor = get_db().cursor()
+    sql = "SELECT items.id, items.name, items.rating, items.ratingnumber, users.username, users.pfp FROM items JOIN users ON items.userid = users.id WHERE items.topicid = ?"
+    cursor.execute(sql, (topicid, ))
+    items = cursor.fetchall()
+    return render_template('topic.html', topics=topics, items=items)
+
+
+@app.post('/rate/<int:itemid>')
+def rate(itemid):
+    rating = request.form['rating']
+    cursor = get_db().cursor()
+    sql = "SELECT * FROM user_ratings WHERE itemid = ? AND userid = ?"
+    cursor.execute(sql, (itemid, session['userid'],))
+    previousrating = cursor.fetchall()
+    if len(previousrating) == 0:
+        cursor = get_db().cursor()
+        sql = "INSERT INTO user_ratings(itemid, userid, rating) VALUES(?,?,?)"
+        cursor.execute(sql, (itemid, session['userid'], rating))
+        get_db().commit()
+    else:
+        cursor = get_db().cursor()
+        sql = "UPDATE user_ratings SET rating = ? WHERE userid = ?, itemid = ?"
+        cursor.execute(sql, (rating, session['userid'], itemid))
+        get_db().commit()
+    return redirect(url_for('topic', topicid=session['topicid']))
 
 
 if __name__ == "__main__":
