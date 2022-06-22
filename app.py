@@ -275,9 +275,25 @@ def topic(topicid):
     cursor.execute(sql, (topicid, ))
     topics = cursor.fetchall()
     cursor = get_db().cursor()
-    sql = "SELECT items.id, items.name, items.rating, items.ratingnumber, users.username, users.pfp FROM items JOIN users ON items.userid = users.id WHERE items.topicid = ?"
+    sql = "SELECT id, name, rating FROM items WHERE topicid = ?"
     cursor.execute(sql, (topicid, ))
     items = cursor.fetchall()
+    cursor = get_db().cursor()
+    sql = "SELECT rating, itemid FROM user_ratings WHERE userid = ?"
+    cursor.execute(sql, (session['userid'], ))
+    user_ratings = cursor.fetchall()
+    checked_numbers = {5: (0, 0, 0, 0, "checked"), 4: (0, 0, 0, "checked", 0), 3: (
+        0, 0, "checked", 0, 0), 2: (0, "checked", 0, 0, 0), 1: ("checked", 0, 0, 0, 0), 0: (0, 0, 0, 0, 0)}
+    for i, item in enumerate(items):
+        for rating in user_ratings:
+            if rating[1] == item[0]:
+                item = item + (checked_numbers[rating[0]], )
+        item = list(item)
+        item[2] = checked_numbers[round(item[2])]
+        item = tuple(item)
+        if len(item) == 3:
+            item = item + (checked_numbers[0], )
+        items[i] = item
     return render_template('topic.html', topics=topics, items=items)
 
 
@@ -295,9 +311,19 @@ def rate(itemid):
         get_db().commit()
     else:
         cursor = get_db().cursor()
-        sql = "UPDATE user_ratings SET rating = ? WHERE userid = ?, itemid = ?"
+        sql = "UPDATE user_ratings SET rating = ? WHERE userid = ? AND itemid = ?"
         cursor.execute(sql, (rating, session['userid'], itemid))
         get_db().commit()
+    cursor = get_db().cursor()
+    sql = "SELECT rating FROM user_ratings WHERE itemid = ?"
+    cursor.execute(sql, (itemid,))
+    allratings = cursor.fetchall()
+    list_items(allratings)
+    ratingavg = sum(allratings) / len(allratings)
+    cursor = get_db().cursor()
+    sql = "UPDATE items SET rating = ? WHERE id = ?"
+    cursor.execute(sql, (ratingavg, itemid))
+    get_db().commit()
     return redirect(url_for('topic', topicid=session['topicid']))
 
 

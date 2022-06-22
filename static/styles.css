@@ -25,7 +25,7 @@ form {
     margin: 2vw;
 }
 
-.ratingform {
+.rating-form {
     margin: 0;
 }
 
@@ -144,7 +144,58 @@ form {
     margin-bottom: 0.5vw;
 }
 
+table {
+    color: #333;
+    background: white;
+    border: 1px solid grey;
+    font-size: 12pt;
+    border-collapse: collapse;
+  }
+  table thead th,
+  table tfoot th {
+    color: black;
+    background: rgba(0,0,0,.1);
+  }
+  table caption {
+    padding:.5em;
+  }
+  table th,
+  table td {
+    padding: .5em;
+    border: 1px solid lightgrey;
+    width: 33vw;
+    height: 2vw;
+    text-align: center;
+  }
+  table p,
+  table form,
+  table input,
+  table label {
+    margin: 0;
+    padding: 0;
+  }
+
+
 /* star rating visuals */
+
+    .rating>label::before {
+        content: "\2605";
+        position: absolute;
+        opacity: 0;
+    }
+
+    .rating-input>label:hover:before,
+    .rating-input>label:hover~label:before {
+        opacity: 1 !important;
+    }
+
+    .rating>input:checked~label:before {
+        opacity: 1;
+    }
+
+    .rating-input:hover>input:checked~label:before {
+        opacity: 0.4;
+    }
 
     .rating {
         display: flex;
@@ -162,23 +213,4 @@ form {
         font-size: 2vw;
         color: #000000;
         cursor: pointer;
-    }
-
-    .rating>label::before {
-        content: "\2605";
-        position: absolute;
-        opacity: 0;
-    }
-
-    .rating>label:hover:before,
-    .rating>label:hover~label:before {
-        opacity: 1 !important;
-    }
-
-    .rating>input:checked~label:before {
-        opacity: 1;
-    }
-
-    .rating:hover>input:checked~label:before {
-        opacity: 0.4;
     }
