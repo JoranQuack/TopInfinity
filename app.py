@@ -299,7 +299,9 @@ def topic(topicid):
 
 @app.post('/rate/<int:itemid>')
 def rate(itemid):
-    rating = request.form['rating']
+    formrating = f"rating.{itemid}"
+    print(formrating)
+    rating = request.form[formrating]
     cursor = get_db().cursor()
     sql = "SELECT * FROM user_ratings WHERE itemid = ? AND userid = ?"
     cursor.execute(sql, (itemid, session['userid'],))
@@ -327,5 +329,16 @@ def rate(itemid):
     return redirect(url_for('topic', topicid=session['topicid']))
 
 
+@app.post('/additem')
+def addrating():
+    name = request.form['itemname'].capitalize()
+    cursor = get_db().cursor()
+    sql = "INSERT INTO items(name, rating, userid, topicid) VALUES(?,?,?,?)"
+    cursor.execute(sql, (name, 0, session['userid'], session['topicid']))
+    get_db().commit()
+    return redirect(url_for('topic', topicid=session['topicid']))
+
+
 if __name__ == "__main__":
     app.run(debug=True)
+
