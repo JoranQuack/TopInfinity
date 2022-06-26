@@ -52,7 +52,7 @@ def topic_check(title, description):
     return error
 
 
-@app.route("/")
+@app.route("/home")
 def home():
     cursor = get_db().cursor()
     sql = "SELECT topics.title, topics.description, users.username, users.pfp, topics.id FROM topics JOIN users ON topics.userid = users.id"
@@ -61,7 +61,7 @@ def home():
     return render_template('home.html', topics=topics)
 
 
-@app.get("/checkcreds")
+@app.get("/")
 def checkcreds():
     if 'username' in session:
         cursor = get_db().cursor()
@@ -275,7 +275,7 @@ def topic(topicid):
     cursor.execute(sql, (topicid, ))
     topics = cursor.fetchall()
     cursor = get_db().cursor()
-    sql = "SELECT id, name, rating FROM items WHERE topicid = ?"
+    sql = "SELECT id, name, rating FROM items WHERE topicid = ? ORDER BY rating DESC"
     cursor.execute(sql, (topicid, ))
     items = cursor.fetchall()
     cursor = get_db().cursor()
@@ -294,7 +294,7 @@ def topic(topicid):
         if len(item) == 3:
             item = item + (checked_numbers[0], )
         items[i] = item
-    return render_template('topic.html', topics=topics, items=items)
+    return render_template('topic.html', topics=topics, items=items, enumerate=enumerate)
 
 
 @app.post('/rate/<int:itemid>')

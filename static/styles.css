@@ -5,6 +5,7 @@
 
 body {
     margin: 1vw;
+    padding: 0.5vw;
 }
 
 a, p, h1, h2, li, b, label {
@@ -14,7 +15,6 @@ a, p, h1, h2, li, b, label {
 
 h1 {
     font-size: 2.2vw;
-    margin-left: 1vw;
 }
 
 h2 {
@@ -68,7 +68,6 @@ form {
     background-color: rgb(150, 150, 150);
     border-radius: 25vw;
     height: 4.7vw;
-    margin: 0.5vw;
 }
 
 .bar-item {
