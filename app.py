@@ -299,6 +299,7 @@ def topic(topicid):
 
 @app.post('/rate/<int:itemid>')
 def rate(itemid):
+    print(itemid)
     formrating = f"rating.{itemid}"
     print(formrating)
     rating = request.form[formrating]
@@ -330,7 +331,7 @@ def rate(itemid):
 
 
 @app.post('/additem')
-def addrating():
+def additem():
     name = request.form['itemname'].capitalize()
     cursor = get_db().cursor()
     sql = "INSERT INTO items(name, rating, userid, topicid) VALUES(?,?,?,?)"

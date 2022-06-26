@@ -194,6 +194,7 @@ table {
 
     .rating>input:checked~label:before {
         opacity: 1;
+        
     }
 
     .rating-input:hover>input:checked~label:before {

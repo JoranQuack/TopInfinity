@@ -7,8 +7,6 @@
 <img class="pfp profile-pfp" src="{{url_for('static', filename='/pfps/'+topics[0][3])}}">
 <p>{{topics[0][2]}}</p>
 
-{{items}}
-
 <table>
     <thead>
         <tr>
@@ -32,26 +30,27 @@
             </td>
             <td>
                 <div class="rating">
-                    <input type="radio" name="rating" value="5" {{item[2][4]}}><label>☆</label>
-                    <input type="radio" name="rating" value="4" {{item[2][3]}}><label>☆</label>
-                    <input type="radio" name="rating" value="3" {{item[2][2]}}><label>☆</label>
-                    <input type="radio" name="rating" value="2" {{item[2][1]}}><label>☆</label>
-                    <input type="radio" name="rating" value="1" {{item[2][0]}}><label>☆</label>
+                    <input type="radio" name="rating.{{item[0]}}" value="5" {{item[2][4]}}><label>☆</label>
+                    <input type="radio" name="rating.{{item[0]}}" value="4" {{item[2][3]}}><label>☆</label>
+                    <input type="radio" name="rating.{{item[0]}}" value="3" {{item[2][2]}}><label>☆</label>
+                    <input type="radio" name="rating.{{item[0]}}" value="2" {{item[2][1]}}><label>☆</label>
+                    <input type="radio" name="rating.{{item[0]}}" value="1" {{item[2][0]}}><label>☆</label>
                 </div>
             </td>
             <td>
-                <form class="ratingform" action="/rate/{{item[0]}}" method="post">
+                <form class="ratingform" action="{{url_for('rate', itemid=item[0])}}" method="post">
+                    {{item[0]}}
                     <div class="rating-input rating">
-                        <input onclick="form.submit()" type="radio" name="rating.{{item[0]}}" value="5" id="5"
-                            {{item[3][4]}}><label for="5">☆</label>
-                        <input onclick="form.submit()" type="radio" name="rating.{{item[0]}}" value="4" id="4"
-                            {{item[3][3]}}><label for="4">☆</label>
-                        <input onclick="form.submit()" type="radio" name="rating.{{item[0]}}" value="3" id="3"
-                            {{item[3][2]}}><label for="3">☆</label>
-                        <input onclick="form.submit()" type="radio" name="rating.{{item[0]}}" value="2" id="2"
-                            {{item[3][1]}}><label for="2">☆</label>
-                        <input onclick="form.submit()" type="radio" name="rating.{{item[0]}}" value="1" id="1"
-                            {{item[3][0]}}><label for="1">☆</label>
+                        <input onclick="form.submit()" type="radio" name="rating.{{item[0]}}" value="5" id="5.{{item[0]}}"
+                            {{item[3][4]}}><label for="5.{{item[0]}}">☆</label>
+                        <input onclick="form.submit()" type="radio" name="rating.{{item[0]}}" value="4" id="4.{{item[0]}}"
+                            {{item[3][3]}}><label for="4.{{item[0]}}">☆</label>
+                        <input onclick="form.submit()" type="radio" name="rating.{{item[0]}}" value="3" id="3.{{item[0]}}"
+                            {{item[3][2]}}><label for="3.{{item[0]}}">☆</label>
+                        <input onclick="form.submit()" type="radio" name="rating.{{item[0]}}" value="2" id="2.{{item[0]}}"
+                            {{item[3][1]}}><label for="2.{{item[0]}}">☆</label>
+                        <input onclick="form.submit()" type="radio" name="rating.{{item[0]}}" value="1" id="1.{{item[0]}}"
+                            {{item[3][0]}}><label for="1.{{item[0]}}">☆</label>
                     </div>
                 </form>
             </td>
