@@ -175,6 +175,7 @@ table {
   }
   input[name="itemname"] {
     text-align: center;
+    font-size: larger;
   }
 
 

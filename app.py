@@ -299,9 +299,7 @@ def topic(topicid):
 
 @app.post('/rate/<int:itemid>')
 def rate(itemid):
-    print(itemid)
     formrating = f"rating.{itemid}"
-    print(formrating)
     rating = request.form[formrating]
     cursor = get_db().cursor()
     sql = "SELECT * FROM user_ratings WHERE itemid = ? AND userid = ?"
@@ -323,6 +321,8 @@ def rate(itemid):
     allratings = cursor.fetchall()
     list_items(allratings)
     ratingavg = sum(allratings) / len(allratings)
+    if len(allratings) <= 3:
+        ratingavg = 0
     cursor = get_db().cursor()
     sql = "UPDATE items SET rating = ? WHERE id = ?"
     cursor.execute(sql, (ratingavg, itemid))

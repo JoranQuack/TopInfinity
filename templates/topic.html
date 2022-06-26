@@ -30,12 +30,20 @@
         {%for i, item in enumerate(items):%}
         <tr class="item-section">
             <td>
-                <p>{{i+1}}</p>
+                {%if item[2] != (0,0,0,0,0):%}
+                    <p>{{i+1}}</p>
+                {%else:%}
+                    <p>N/A</p>
+                {%endif%}
+
             </td>
             <td>
                 <p>{{item[1]}}</p>
             </td>
             <td>
+                {%if item[2] == (0,0,0,0,0):%}
+                <p>Not yet ranked</p>
+                {%else:%}
                 <div class="rating">
                     <input type="radio" name="rating.{{item[0]}}" value="5" {{item[2][4]}}><label>☆</label>
                     <input type="radio" name="rating.{{item[0]}}" value="4" {{item[2][3]}}><label>☆</label>
@@ -43,20 +51,26 @@
                     <input type="radio" name="rating.{{item[0]}}" value="2" {{item[2][1]}}><label>☆</label>
                     <input type="radio" name="rating.{{item[0]}}" value="1" {{item[2][0]}}><label>☆</label>
                 </div>
+                {%endif%}
             </td>
             <td>
                 <form class="ratingform" action="{{url_for('rate', itemid=item[0])}}" method="post">
                     <div class="rating-input rating">
                         <input onclick="form.submit()" type="radio" name="rating.{{item[0]}}" value="5"
-                            id="5.{{item[0]}}" {{item[3][4]}}><label for="5.{{item[0]}}">☆</label>
+                            id="5.{{item[0]}}" {{item[3][4]}}>
+                        <label for="5.{{item[0]}}">☆</label>
                         <input onclick="form.submit()" type="radio" name="rating.{{item[0]}}" value="4"
-                            id="4.{{item[0]}}" {{item[3][3]}}><label for="4.{{item[0]}}">☆</label>
+                            id="4.{{item[0]}}" {{item[3][3]}}>
+                        <label for="4.{{item[0]}}">☆</label>
                         <input onclick="form.submit()" type="radio" name="rating.{{item[0]}}" value="3"
-                            id="3.{{item[0]}}" {{item[3][2]}}><label for="3.{{item[0]}}">☆</label>
+                            id="3.{{item[0]}}" {{item[3][2]}}>
+                        <label for="3.{{item[0]}}">☆</label>
                         <input onclick="form.submit()" type="radio" name="rating.{{item[0]}}" value="2"
-                            id="2.{{item[0]}}" {{item[3][1]}}><label for="2.{{item[0]}}">☆</label>
+                            id="2.{{item[0]}}" {{item[3][1]}}>
+                        <label for="2.{{item[0]}}">☆</label>
                         <input onclick="form.submit()" type="radio" name="rating.{{item[0]}}" value="1"
-                            id="1.{{item[0]}}" {{item[3][0]}}><label for="1.{{item[0]}}">☆</label>
+                            id="1.{{item[0]}}" {{item[3][0]}}>
+                        <label for="1.{{item[0]}}">☆</label>
                     </div>
                 </form>
             </td>
