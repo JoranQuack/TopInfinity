@@ -55,6 +55,25 @@ def topic_check(title, description):
 @app.route("/home")
 def home():
     cursor = get_db().cursor()
+    sql = "SELECT id FROM items"
+    cursor.execute(sql)
+    allitems = cursor.fetchall()
+    list_items(allitems)
+    for number in allitems:
+        cursor = get_db().cursor()
+        sql = "SELECT rating FROM user_ratings WHERE itemid = ?"
+        cursor.execute(sql, (number,))
+        allratings = cursor.fetchall()
+        list_items(allratings)
+        if len(allratings) <= 3:
+            ratingavg = 0
+        else:
+            ratingavg = sum(allratings) / len(allratings)
+        cursor = get_db().cursor()
+        sql = "UPDATE items SET rating = ? WHERE id = ?"
+        cursor.execute(sql, (ratingavg, number))
+        get_db().commit()
+    cursor = get_db().cursor()
     sql = "SELECT topics.title, topics.description, users.username, users.pfp, topics.id FROM topics JOIN users ON topics.userid = users.id"
     cursor.execute(sql)
     topics = cursor.fetchall()
@@ -205,7 +224,6 @@ def deleteacc(confirmed):
 @app.get('/deletetopic/<confirmed>')
 def deletetopic(confirmed):
     if confirmed == "True":
-        print(confirmed)
         cursor = get_db().cursor()
         sql = "DELETE FROM topics WHERE id=?"
         cursor.execute(sql, (session['topicid'], ))
@@ -271,11 +289,11 @@ def edittopic_post():
 def topic(topicid):
     session['topicid'] = topicid
     cursor = get_db().cursor()
-    sql = "SELECT topics.title, topics.description, users.username, users.pfp FROM topics JOIN users ON topics.userid = users.id WHERE topics.id = ?"
+    sql = "SELECT topics.title, topics.description, users.username, users.pfp, topics.userid FROM topics JOIN users ON topics.userid = users.id WHERE topics.id = ?"
     cursor.execute(sql, (topicid, ))
     topics = cursor.fetchall()
     cursor = get_db().cursor()
-    sql = "SELECT id, name, rating FROM items WHERE topicid = ? ORDER BY rating DESC"
+    sql = "SELECT id, name, rating, userid FROM items WHERE topicid = ? ORDER BY rating DESC"
     cursor.execute(sql, (topicid, ))
     items = cursor.fetchall()
     cursor = get_db().cursor()
@@ -287,14 +305,16 @@ def topic(topicid):
     for i, item in enumerate(items):
         for rating in user_ratings:
             if rating[1] == item[0]:
+                print(item)
+                print(rating)
                 item = item + (checked_numbers[rating[0]], )
         item = list(item)
         item[2] = checked_numbers[round(item[2])]
         item = tuple(item)
-        if len(item) == 3:
+        if len(item) == 4:
             item = item + (checked_numbers[0], )
         items[i] = item
-    return render_template('topic.html', topics=topics, items=items, enumerate=enumerate)
+    return render_template('topic.html', topics=topics, items=items, enumerate=enumerate, userid=session['userid'])
 
 
 @app.post('/rate/<int:itemid>')
@@ -315,18 +335,6 @@ def rate(itemid):
         sql = "UPDATE user_ratings SET rating = ? WHERE userid = ? AND itemid = ?"
         cursor.execute(sql, (rating, session['userid'], itemid))
         get_db().commit()
-    cursor = get_db().cursor()
-    sql = "SELECT rating FROM user_ratings WHERE itemid = ?"
-    cursor.execute(sql, (itemid,))
-    allratings = cursor.fetchall()
-    list_items(allratings)
-    ratingavg = sum(allratings) / len(allratings)
-    if len(allratings) <= 3:
-        ratingavg = 0
-    cursor = get_db().cursor()
-    sql = "UPDATE items SET rating = ? WHERE id = ?"
-    cursor.execute(sql, (ratingavg, itemid))
-    get_db().commit()
     return redirect(url_for('topic', topicid=session['topicid']))
 
 
@@ -336,6 +344,19 @@ def additem():
     cursor = get_db().cursor()
     sql = "INSERT INTO items(name, rating, userid, topicid) VALUES(?,?,?,?)"
     cursor.execute(sql, (name, 0, session['userid'], session['topicid']))
+    get_db().commit()
+    return redirect(url_for('topic', topicid=session['topicid']))
+
+
+@app.get('/deleteitem/<int:itemid>')
+def deleteitem(itemid):
+    cursor = get_db().cursor()
+    sql = "DELETE FROM items WHERE id=?"
+    cursor.execute(sql, (itemid, ))
+    get_db().commit()
+    cursor = get_db().cursor()
+    sql = "DELETE FROM user_ratings WHERE itemid=?" 
+    cursor.execute(sql, (itemid, ))
     get_db().commit()
     return redirect(url_for('topic', topicid=session['topicid']))
 
