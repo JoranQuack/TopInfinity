@@ -42,11 +42,19 @@ def list_items(results):
     return results
 
 
-def topic_check(title, description):
+def add_check(title, description):
     if title.replace(' ', '').isalpha() == False:
         error = "Title must only include letters"
     elif description.replace(' ', '').isalpha() == False:
         error = "Description must only include letters"
+    else:
+        error = "none"
+    return error
+
+
+def character_limit(check, number):
+    if len(check) > number:
+        error = "Input is too long"
     else:
         error = "none"
     return error
@@ -245,7 +253,9 @@ def addtopic():
 def addtopic_post():
     title = request.form['title'].capitalize()
     description = request.form['description']
-    error = topic_check(title, description)
+    error = character_limit(title, 30)
+    error = character_limit(description, 130)
+    error = add_check(title, description)
     if error == "none":
         cursor = get_db().cursor()
         sql = "INSERT INTO topics(userid, title, description) VALUES(?,?,?)"
@@ -270,7 +280,9 @@ def edittopic(topicid):
 def edittopic_post():
     title = request.form['title'].capitalize()
     description = request.form['description']
-    error = topic_check(title, description)
+    error = character_limit(title, 30)
+    error = character_limit(description, 130)
+    error = add_check(title, description)
     if error == "none":
         cursor = get_db().cursor()
         sql = "UPDATE topics SET title = ?, description = ?  WHERE id = ?"
@@ -305,8 +317,6 @@ def topic(topicid):
     for i, item in enumerate(items):
         for rating in user_ratings:
             if rating[1] == item[0]:
-                print(item)
-                print(rating)
                 item = item + (checked_numbers[rating[0]], )
         item = list(item)
         item[2] = checked_numbers[round(item[2])]
@@ -342,9 +352,15 @@ def rate(itemid):
 def additem():
     name = request.form['itemname'].capitalize()
     cursor = get_db().cursor()
-    sql = "INSERT INTO items(name, rating, userid, topicid) VALUES(?,?,?,?)"
-    cursor.execute(sql, (name, 0, session['userid'], session['topicid']))
-    get_db().commit()
+    sql = "SELECT name FROM items WHERE topicid = ?"
+    cursor.execute(sql, (session['topicid'],))
+    previousnames = cursor.fetchall()
+    list_items(previousnames)
+    if name not in previousnames and name.replace(' ', '').isalpha() == True:
+        cursor = get_db().cursor()
+        sql = "INSERT INTO items(name, rating, userid, topicid) VALUES(?,?,?,?)"
+        cursor.execute(sql, (name, 0, session['userid'], session['topicid']))
+        get_db().commit()
     return redirect(url_for('topic', topicid=session['topicid']))
 
 
