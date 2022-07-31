@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Page</title>
+    <link rel="stylesheet" href="{{url_for('static',filename='styles.css')}}">
+</head>
+
+<body>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function (event) {
+          var scrollpos = localStorage.getItem("scrollpos");
+          if (scrollpos) window.scrollTo(0, scrollpos);
+        });
+      
+        window.onscroll = function (e) {
+          localStorage.setItem("scrollpos", window.scrollY);
+        };
+      </script>
+
+    <h1>Users</h1>
+    <table>
+        <thead>
+            <tr class="item-section">
+                <th>
+                    <p>id</p>
+                </th>
+                <th>
+                    <p>username</p>
+                </th>
+                <th>
+                    <p>password</p>
+                </th>
+                <th>
+                    <p>pfp</p>
+                </th>
+                <th>
+                    <p>email</p>
+                </th>
+                <th>
+                    <p>delete</p>
+                </th>
+            </tr>
+        </thead>
+        <tbody>
+            {%for user in users:%}
+            <tr class="item-section">
+                <th>
+                    <p>{{user[0]}}</p>
+                </th>
+                <th>
+                    <p>{{user[1]}}</p>
+                </th>
+                <th>
+                    <p>{{user[2]}}</p>
+                </th>
+                <th>
+                    <p>{{user[3]}}</p>
+                </th>
+                <th>
+                    <p>{{user[4]}}</p>
+                </th>
+                <th>
+                    <a class="button-icon" href="{{url_for('admin_deleteuser', userid=user[0])}}">
+                        <img class="button-icon"
+                            src="{{url_for('static', filename='/websitecomponents/icon-delete.png')}}">
+                    </a>
+                </th>
+            </tr>
+            {%endfor%}
+        </tbody>
+    </table>
+
+
+    <h1>Topics</h1>
+    <table>
+        <thead>
+            <tr class="item-section">
+                <th>
+                    <p>id</p>
+                </th>
+                <th>
+                    <p>userid</p>
+                </th>
+                <th>
+                    <p>name</p>
+                </th>
+                <th>
+                    <p>description</p>
+                </th>
+                <th>
+                    <p>delete</p>
+                </th>
+            </tr>
+        </thead>
+        <tbody>
+            {%for topic in topics:%}
+            <tr class="item-section">
+                <th>
+                    <p>{{topic[0]}}</p>
+                </th>
+                <th>
+                    <p>{{topic[1]}}</p>
+                </th>
+                <th>
+                    <p>{{topic[2]}}</p>
+                </th>
+                <th>
+                    <p>{{topic[3]}}</p>
+                </th>
+                <th>
+                    <a class="button-icon" href="{{url_for('admin_deletetopic', topicid=topic[0])}}">
+                        <img class="button-icon"
+                            src="{{url_for('static', filename='/websitecomponents/icon-delete.png')}}">
+                    </a>
+                </th>
+            </tr>
+            {%endfor%}
+        </tbody>
+    </table>
+
+
+    <h1>Items</h1>
+    <table>
+        <thead>
+            <tr class="item-section">
+                <th>
+                    <p>id</p>
+                </th>
+                <th>
+                    <p>topicid</p>
+                </th>
+                <th>
+                    <p>userid</p>
+                </th>
+                <th>
+                    <p>name</p>
+                </th>
+                <th>
+                    <p>rating</p>
+                </th>
+                <th>
+                    <p>delete</p>
+                </th>
+            </tr>
+        </thead>
+        <tbody>
+            {%for item in items:%}
+            <tr class="item-section">
+                <th>
+                    <p>{{item[0]}}</p>
+                </th>
+                <th>
+                    <p>{{item[1]}}</p>
+                </th>
+                <th>
+                    <p>{{item[2]}}</p>
+                </th>
+                <th>
+                    <p>{{item[3]}}</p>
+                </th>
+                <th>
+                    <p>{{item[4]}}</p>
+                </th>
+                <th>
+                    <a class="button-icon" href="{{url_for('deleteitem', itemid=item[0])}}">
+                        <img class="button-icon"
+                            src="{{url_for('static', filename='/websitecomponents/icon-delete.png')}}">
+                    </a>
+                </th>
+            </tr>
+            {%endfor%}
+        </tbody>
+    </table>
+</body>
+
+</html>

@@ -129,6 +129,10 @@ def signup_post():
     email = request.form['email']
     h = hashlib.md5(password.encode())
     password = h.hexdigest()
+    error = character_limit(username, 20)
+    error = character_limit(email, 30)
+    if error != "none":
+        return render_template('signup.html', error=error)
     cursor = get_db().cursor()
     sql = "SELECT username FROM users"
     cursor.execute(sql)
@@ -351,12 +355,13 @@ def rate(itemid):
 @app.post('/additem')
 def additem():
     name = request.form['itemname'].capitalize()
+    error = character_limit(name, 50)
     cursor = get_db().cursor()
     sql = "SELECT name FROM items WHERE topicid = ?"
     cursor.execute(sql, (session['topicid'],))
     previousnames = cursor.fetchall()
     list_items(previousnames)
-    if name not in previousnames and name.replace(' ', '').isalpha() == True:
+    if name not in previousnames and name.replace(' ', '').isalpha() == True and error == "none":
         cursor = get_db().cursor()
         sql = "INSERT INTO items(name, rating, userid, topicid) VALUES(?,?,?,?)"
         cursor.execute(sql, (name, 0, session['userid'], session['topicid']))
@@ -374,7 +379,47 @@ def deleteitem(itemid):
     sql = "DELETE FROM user_ratings WHERE itemid=?" 
     cursor.execute(sql, (itemid, ))
     get_db().commit()
-    return redirect(url_for('topic', topicid=session['topicid']))
+    try:
+        return redirect(url_for('topic', topicid=session['topicid']))
+    except:
+        return redirect(url_for('admin'))
+
+
+@app.get('/admin')
+def admin():
+    if session['userid'] != 44:
+        return redirect(url_for('checkcreds'))
+    cursor = get_db().cursor()
+    sql = "SELECT * FROM users"
+    cursor.execute(sql)
+    users = cursor.fetchall()
+    cursor = get_db().cursor()
+    sql = "SELECT * FROM topics"
+    cursor.execute(sql)
+    topics = cursor.fetchall()
+    cursor = get_db().cursor()
+    sql = "SELECT * FROM items"
+    cursor.execute(sql)
+    items = cursor.fetchall()
+    return render_template('admin.html', users=users, topics=topics, items=items)
+
+
+@app.get('/admin_deleteuser/<int:userid>')
+def admin_deleteuser(userid):
+    cursor = get_db().cursor()
+    sql = "DELETE FROM users WHERE id=?"
+    cursor.execute(sql, (userid, ))
+    get_db().commit()
+    return redirect(url_for('admin'))
+
+
+@app.get('/admin_deletetopic/<int:topicid>')
+def admin_deletetopic(topicid):
+    cursor = get_db().cursor()
+    sql = "DELETE FROM topics WHERE id=?"
+    cursor.execute(sql, (topicid, ))
+    get_db().commit()
+    return redirect(url_for('admin'))
 
 
 if __name__ == "__main__":
