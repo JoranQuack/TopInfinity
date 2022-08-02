@@ -1,24 +1,66 @@
 @font-face {
-    font-family: DosisRegular;
-    src: url(/static/websitecomponents/dosis-font/Dosis-VariableFont_wght.ttf);
+    font-family: Dosis;
+    src: url(/static/websitecomponents/dosis-font/Dosis-VariableFont_wght.ttf) format("truetype-variations");
+    font-weight: 1 999;
 }
 
 body {
-    margin: 1vw;
-    padding: 0.5vw;
+    margin: 0vw;
+    padding: 1.5vw;
+    background-color: #7161ef;
 }
 
-a, p, h1, h2, li, b, label {
-    font-family: DosisRegular;
+a, p, h1, h2, h3, li, b, label, span, title {
+    text-decoration: none;
+    font-family: Dosis;
     font-size: 1.3vw;
+    color: #7161ef;
 }
 
 h1 {
     font-size: 2.2vw;
+    font-weight: 999;
 }
 
 h2 {
     font-size: 1.8vw;
+    font-weight: 700;
+}
+
+h3 {
+    font-size: 1.5vw;
+    margin: 0.5vw 0 1vw 0;
+}
+
+.stranded-h1 {
+    color: white;
+    margin-left: 1vw;
+}
+
+.bar {
+    display: flex;
+    justify-content: space-between;
+    background-color: rgb(255, 255, 255);
+    border-radius: 25vw;
+    height: 4.7vw;
+}
+
+.bar-pfp {
+    margin: 0.6vw
+}
+
+.bar-item {
+    border-radius: 25vw;
+    font-size: 2vw;
+    font-weight: 999;
+    margin-top: 0;
+    color: #7161ef;
+    padding: 1vw 1.5vw 1vw 1.5vw;
+}
+
+.bar-item:hover {
+    color: #ffffff;
+    background-color: #7161ef;
 }
 
 form {
@@ -31,7 +73,6 @@ form {
 
 .input-description {
     size: 50;
-
 }
 
 .pfp {
@@ -39,10 +80,6 @@ form {
     border-radius: 1000px;
     height: 3.5vw;
     width: 3.5vw;
-}
-
-.bar-pfp {
-    margin: 0.6vw
 }
 
 .centered-pfp {
@@ -53,38 +90,39 @@ form {
 }
 
 .profile {
-    display: flex;
-    justify-content: flex-start;
-}
-
-.profile-pfp {
-    width: 3vw;
+    display: inline-block;
+    padding: 0 1.5vw;
     height: 3vw;
+    line-height: 3vw;
+    border-radius: 1.5vw;
+    font-family: Dosis;
+    font-size: 1.3vw;
+    margin-bottom: 0.5vw;
+    color: #7161ef;
+    background-color: #ffffff;
 }
 
-.bar {
-    display: flex;
-    justify-content: space-between;
-    background-color: rgb(150, 150, 150);
-    border-radius: 25vw;
-    height: 4.7vw;
-}
-
-.bar-item {
-    text-decoration: none;
-    color: black;
-    font-size: 2vw;
-    margin: 1vw;
-    margin-left: 1.5vw;
+.profile img {
+    float: left;
+    margin: 0 0.5vw 0 -1.5vw;
+    height: 3vw;
+    width: 3vw;
+    border-radius: 50%;
 }
 
 .topic-box {
-    background-color: rgb(150, 150, 150);
-    padding: 1vw;
+    background-color: #ffffff;
+    padding: 1vw 1.5vw 1vw 1.5vw;
     margin-bottom: 1.5vw;
-    margin-left: 0.5vw;
-    margin-right: 0.5vw;
-    border-radius: 1.5vw;
+    border-radius: 2vw;
+    display: flex;
+    justify-content: space-between;
+}
+
+.vertical-divider {
+    border-left: 0.25vw solid #7161ef;
+    border-radius: 100vw;
+    margin: 0 1vw 0 1vw;
 }
 
 .important {
@@ -96,51 +134,76 @@ form {
     justify-content: space-between;
 }
 
-.add-button {
-    font-weight: bold;
-    padding: 1vw;
-    height: fit-content;
-    width: fit-content;
-    margin-right: 0.5vw;
-    margin-top: 1vw;
-    background-color: rgb(150, 150, 150);
+.addtopic-button {
+    margin-top: 1.3vw;
+    height: 3vw;
+}
+
+.rate-button {
+    font-size: 1vw;
+}
+
+.button {
+    padding: 0 1.5vw;
+    font-weight: 700;
+    background-color: #ffffff;
     border-radius: 2vw;
+    line-height: 3vw;
     text-decoration: none;
-    color: black;
+    color: #7161ef;
+}
+
+.button:hover {
+    color: #ffffff;
+    background-color: #7161ef;
 }
 
 .add-text {
     font-size: 4vw;
 }
 
-.topic-text {
+.topic-left {
     margin-top: 0;
-    margin-left: 0.5vw
+    margin-left: 0.5vw;
+    width: 46vw;
+    display: flex;
+    justify-content: space-between;
 }
 
 .profile-pfp {
     margin-left: 0.5vw;
 }
 
-.box-top {
+.topic-info {
     margin: 0;
     margin-top: 0vw;
-    display: flex;
-    justify-content: space-between;
+    margin-right: 0.5vw;
+}
+
+.topic-items {
+    width: 46vw;
+    padding-left: 0.5vw;
 }
 
 .button-icon {
-    margin: 0;
-    height: 2vw;
+    margin-left: 3vw;
+    line-height: 3vw;
 }
 
-.description {
+.button-icon svg {
+    background-color: aqua;
+    fill: #7161ef;
+    width: 50px;
+    height: 50px;
+}
+
+.topic-description {
     margin-top: 0;
 }
 
-.title {
+.topic-title {
     margin-top: 0.5vw;
-    margin-bottom: 0.5vw;
+    margin-bottom: 0vw;
 }
 
 table {
@@ -149,72 +212,77 @@ table {
     border: 1px solid grey;
     font-size: 12pt;
     border-collapse: collapse;
-  }
-  table thead th,
-  table tfoot th {
+}
+
+table thead th,
+table tfoot th {
     color: black;
-    background: rgba(0,0,0,.1);
-  }
-  table caption {
-    padding:.5em;
-  }
-  table th,
-  table td {
+    background: rgba(0, 0, 0, .1);
+}
+
+table caption {
+    padding: .5em;
+}
+
+table th,
+table td {
     padding: .5em;
     border: 1px solid lightgrey;
     width: 33vw;
     height: 2vw;
     text-align: center;
-  }
-  table p,
-  table form,
-  table input,
-  table label {
+}
+
+table p,
+table form,
+table input,
+table label {
     margin: 0;
     padding: 0;
-  }
-  input[name="itemname"] {
+}
+
+input[name="itemname"] {
     text-align: center;
     font-size: larger;
-  }
+}
 
 
 /* star rating visuals */
 
-    .rating>label::before {
-        content: "\2605";
-        position: absolute;
-        opacity: 0;
-    }
+.rating>label::before {
+    content: "\2605";
+    position: absolute;
+    opacity: 0;
+}
 
-    .rating-input>label:hover:before,
-    .rating-input>label:hover~label:before {
-        opacity: 1 !important;
-    }
+.rating-input>label:hover:before,
+.rating-input>label:hover~label:before {
+    opacity: 1 !important;
+}
 
-    .rating>input:checked~label:before {
-        opacity: 1;
-        
-    }
+.rating>input:checked~label:before {
+    opacity: 1;
 
-    .rating-input:hover>input:checked~label:before {
-        opacity: 0.4;
-    }
+}
 
-    .rating {
-        display: flex;
-        flex-direction: row-reverse;
-        justify-content: center;
-    }
+.rating-input:hover>input:checked~label:before {
+    opacity: 0.4;
+}
 
-    .rating>input {
-        display: none;
-    }
+.rating {
+    display: flex;
+    flex-direction: row-reverse;
+    justify-content: center;
+}
 
-    .rating>label {
-        position: relative;
-        width: 1.5vw;
-        font-size: 2vw;
-        color: #000000;
-        cursor: pointer;
-    }
+.rating>input {
+    display: none;
+}
+
+.rating>label {
+    position: relative;
+    width: 1.5vw;
+    font-size: 2vw;
+    color: #000000;
+    cursor: pointer;
+}

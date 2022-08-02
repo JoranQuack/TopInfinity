@@ -73,20 +73,26 @@ def home():
         cursor.execute(sql, (number,))
         allratings = cursor.fetchall()
         list_items(allratings)
-        if len(allratings) <= 3:
-            ratingavg = 0
-        else:
+        try:
             ratingavg = sum(allratings) / len(allratings)
+        except:
+            ratingavg = 0
         cursor = get_db().cursor()
         sql = "UPDATE items SET rating = ? WHERE id = ?"
         cursor.execute(sql, (ratingavg, number))
         get_db().commit()
     cursor = get_db().cursor()
-    sql = "SELECT topics.title, topics.description, users.username, users.pfp, topics.id FROM topics JOIN users ON topics.userid = users.id"
+    sql = "SELECT topics.title, topics.description, users.username, users.pfp, topics.id FROM topics JOIN users ON topics.userid = users.id;"
     cursor.execute(sql)
     topics = cursor.fetchall()
+    for i, topic in enumerate(topics):
+        cursor = get_db().cursor()
+        sql = "SELECT name FROM items WHERE topicid = ? ORDER BY rating DESC LIMIT 8;"
+        cursor.execute(sql, (topic[4], ))
+        items = cursor.fetchall()
+        topic = topic + (tuple(list_items(items)), )
+        topics[i] = topic
     return render_template('home.html', topics=topics)
-
 
 @app.get("/")
 def checkcreds():

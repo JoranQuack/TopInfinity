@@ -1,28 +1,43 @@
 {% extends "layout.html" %}
 {% block content %}
 <div class="topics-header">
-    <h1>Topics</h1>
-    <a href="{{url_for('addtopic')}}" class="add-button">ADD TOPIC</a>
+    <h1 class="stranded-h1">Topics</h1>
+    <a href="{{url_for('addtopic')}}" class="button addtopic-button">ADD TOPIC</a>
 </div>
 
-{%for item in topics%}
+{%for topic in topics%}
 <div class="topic-box">
-    <div class="topic-text">
-        <div class="box-top">
-            <h2 class="title">{{item[0]}}</h2>
-            {%if item[2] == session['username']:%}
-            <a class="button-icon" href="{{url_for('edittopic', topicid=item[4])}}">
-                <img class="button-icon" src="{{url_for('static', filename='/websitecomponents/icon-edit.png')}}">
+    <div class="topic-left">
+        <div class="topic-info">
+            <h2 class="topic-title">{{topic[0]}}</h2>
+            <p class="topic-description">{{topic[1]}}</p>
+            <div class="profile">
+                <img src="{{url_for('static', filename='pfps/'+topic[3])}}">
+                {{topic[2]}}
+            </div>
+        </div>
+        <div class="topic-interaction">
+            <a class="button rate-button" href="{{url_for('topic', topicid=topic[4])}}">GO RATE</a> <br>
+            {%if topic[2] == session['username']:%}
+            <a class="button-icon" href="{{url_for('edittopic', topicid=topic[4])}}">
+                <svg height="48" width="48">
+                    <path
+                        d="M9 39h2.2l22.15-22.15-2.2-2.2L9 36.8Zm30.7-24.3-6.4-6.4 2.1-2.1q.85-.85 2.1-.85t2.1.85l2.2 2.2q.85.85.85 2.1t-.85 2.1Zm-2.1 2.1L12.4 42H6v-6.4l25.2-25.2Zm-5.35-1.05-1.1-1.1 2.2 2.2Z" />
+                </svg>
             </a>
             {%endif%}
         </div>
-        <p class="description">{{item[1]}}</p>
-        <a href="{{url_for('topic', topicid=item[4])}}">View Topic</a>
     </div>
-    <div class="profile">
-        <img class="pfp profile-pfp" src="{{url_for('static', filename='pfps/'+item[3])}}">
-        <p class="topic-text">{{item[2]}}</p>
+    <div class="vertical-divider"></div>
+    <div class="topic-items">
+        <h3>Top Results</h3>
+        {%for item in topic[5]:%}
+        <span>{{item}}</span>
+        {%endfor%}
+        <span class="add-button">+</span>
     </div>
+</div>
+
 </div>
 {%endfor%}
 {% endblock %}

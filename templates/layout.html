@@ -11,12 +11,24 @@
 
 <body>
     <div class="bar">
-        <a href="{{url_for('home')}}" class="bar-item button">TopInfinity</a>
+        <a href="{{url_for('home')}}" class="bar-item">TopInfinity</a>
         <a href="{{url_for('account')}}"><img src="{{url_for('static', filename='pfps/'+session['pfp'])}}"
-                class="button bar-pfp pfp"></img></a>
+                class="bar-pfp pfp"></img></a>
     </div>
     {% block content %}
     {% endblock %}
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function (event) {
+          var scrollpos = localStorage.getItem("scrollpos");
+          if (scrollpos) window.scrollTo(0, scrollpos);
+        });
+      
+        window.onscroll = function (e) {
+          localStorage.setItem("scrollpos", window.scrollY);
+        };
+      </script>
+
 </body>
 
 </html>
