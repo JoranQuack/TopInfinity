@@ -7,7 +7,7 @@
     <link rel="stylesheet" href="{{url_for('static', filename='styles.css')}}">
     <title>Welcome</title>
 </head>
-<body>
+<body onload="document.body.style.opacity='1'">
     {% block content %}
     {% endblock %}
 </body>

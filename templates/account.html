@@ -1,35 +1,25 @@
 {% extends "layout.html" %}
 {% block content %}
-<img src="{{url_for('static', filename='pfps/'+session['pfp'])}}" class="centered-pfp pfp"></img>
-<br>
-<h1 style="text-align: center;">Hi there, {{session['username']}}</h1>
-<p style="text-align: center;">Email: {{session['email']}}</p>
-<a href="{{url_for('logout')}}" style="width: 10vw; margin-left: 47.5vw;">Log Out</a>
-<h2>Upload a New Profile Picture</h2>
-<p>
-	{% with messages = get_flashed_messages() %}
-	{% if messages %}
-<ul>
-	{% for message in messages %}
-	<li>{{ message }}</li>
-	{% endfor %}
-</ul>
-{% endif %}
-{% endwith %}
-</p>
-{% if filename %}
-<div>
-	<img src="{{url_for('display_image', filename=filename)}}">
+<div class="account-boxes">
+	<div class="left-accbox accbox">
+		<h1>Upload a New Profile Picture</h1>
+		<form method="post" action="/pfp" enctype="multipart/form-data">
+			<label class="button">
+				<input type="file" name="file" onchange="form.submit()" accept=".png, .jpg, .jpeg, .gif, .JPG" required>
+				Upload a File
+			</label>
+		</form>
+		<p class="important">{{error}}</p>
+	</div>
+	<div class="centre-accbox accbox">
+		<img src="{{url_for('static', filename='pfps/'+session['pfp'])}}" class="pfp"></img> <br>
+		<h1>Hi there, {{session['username']}}</h1>
+		<p>Email: {{session['email']}}</p>
+		<a class="button" href="{{url_for('logout')}}">Log Out</a>
+	</div>
+	<div class="right-accbox accbox">
+		<h1>Delete your Account</h1>
+		<a href="{{url_for('deleteacc', confirmed='False')}}" class="button important">Delete Account</a>
+	</div>
 </div>
-{% endif %}
-<form method="post" action="/pfp" enctype="multipart/form-data">
-	<dl>
-		<p>
-			<input type="file" name="file" onchange="form.submit()" accept=".png, .jpg, .jpeg, .gif" required>
-		</p>
-	</dl>
-</form>
-<p class="important">{{error}}</p>
-<a href="{{url_for('deleteacc', confirmed='False')}}" class="important">Delete Account</a>
-
 {% endblock %}

@@ -1,28 +1,28 @@
 {% extends "welcomelayout.html" %}
 {% block content %}
 
-
-<h1>Create your account</h1>
-<form action="/signup" method="post" class="">
-    <div class="container">
-        <label for="username"><b>Username</b></label>
-        <input type="text" placeholder="Enter Username" name="username" class="" required>
-
-        <label for="password"><b>Password</b></label>
-        <input type="password" placeholder="Enter Password" name="password" class="" required>
-
-        <label for="email"><b>Email</b></label>
-        <input type="text" placeholder="Enter Email" name="email" class="" required>
-
-        <button type="submit" class="">Sign Up</button>
-
-        <p class="important">{{error}}</p>
+<div class="login">
+    <div class="side-login">
+        <h1>Sign In to Exisitng Account</h1>
         <p>Already have an account?</p>
-
-        <a href="{{url_for('signin')}}" class="">Sign In</a>
+        <a href="{{url_for('signin')}}" class="button">Sign In</a>
     </div>
-</form>
-<a href="{{url_for('checkcreds')}}" class="">Cancel</a>
+    <div class="main-login signup-login">
+        <h1>Create Your Account</h1>
+        <form action="/signup" method="post">
+            <label for="username">Username</label> <br>
+            <input type="text" placeholder="Enter Username" name="username" required> <br>
 
+            <label for="password">Password</label> <br>
+            <input type="password" placeholder="Enter Password" name="password" required> <br>
+
+            <label for="email">Email</label> <br>
+            <input type="text" placeholder="Enter Email" name="email" required> <br>
+
+            <button type="submit" class="button">Sign Up</button>
+            <p class="important">{{error}}</p>
+        </form>
+    </div>
+</div>
 
 {% endblock %}

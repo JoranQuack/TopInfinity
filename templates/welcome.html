@@ -1,9 +1,12 @@
 {% extends "welcomelayout.html" %}
 {% block content %}
 
+<div class="big"></div>
 
-<p>{{error}}</p>
-<a href="{{url_for('signin')}}" class="w3-bar-item w3-button">Sign In</a>
-
+<div class="welcome">
+    <h1>Welcome!</h1>
+    <p>{{error}}</p>
+    <a href="{{url_for('signin')}}" class="button">Sign In</a>
+</div>
 
 {%endblock%}

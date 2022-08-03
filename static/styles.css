@@ -7,14 +7,16 @@
 body {
     margin: 0vw;
     padding: 1.5vw;
-    background-color: #7161ef;
+    background-color: #5630a8;
+    opacity: 0;
+    transition: opacity 0.5s;
 }
 
-a, p, h1, h2, h3, li, b, label, span, title {
+a, p, h1, h2, h3, li, b, label, span, title, input, button, ul, li, dl {
     text-decoration: none;
     font-family: Dosis;
     font-size: 1.3vw;
-    color: #7161ef;
+    color: #5630a8;
 }
 
 h1 {
@@ -32,9 +34,46 @@ h3 {
     margin: 0.5vw 0 1vw 0;
 }
 
+.boxless-text {
+    margin-left: 1vw;
+}
+
+.boxless-text p, h1, label {
+    color: #ffffff;
+}
+
 .stranded-h1 {
     color: white;
     margin-left: 1vw;
+}
+
+.button {
+    padding: 0.5vw 1.5vw;
+    font-weight: 700;
+    background-color: #ffffff;
+    border-radius: 2vw;
+    line-height: 3vw;
+    text-decoration: none;
+    color: #5630a8;
+    box-shadow: 0px 0px 1vw #00000050;
+    transition: background-color 0.5s, color 0.5s, fill 0.5s;
+}
+
+.button:hover {
+    color: #ffffff;
+    fill: rgb(255, 255, 255);
+    background-color: #5630a8;
+}
+
+.addtopic-button {
+    margin-top: 1.3vw;
+    height: 3vw;
+    padding: 0 1.5vw;
+
+}
+
+.rate-button {
+    font-size: 1vw;
 }
 
 .bar {
@@ -46,7 +85,14 @@ h3 {
 }
 
 .bar-pfp {
-    margin: 0.6vw
+    margin: -0.35vw 0.6vw 0 0;
+    height: 3.5vw;
+    width: 3.5vw;
+    transition: opacity 0.5s;
+}
+
+.bar-pfp:hover{
+    opacity: 50%;
 }
 
 .bar-item {
@@ -54,39 +100,112 @@ h3 {
     font-size: 2vw;
     font-weight: 999;
     margin-top: 0;
-    color: #7161ef;
-    padding: 1vw 1.5vw 1vw 1.5vw;
+    color: #5630a8;
+    padding: 1vw 1.5vw 3.7vw 1.5vw;
+    transition: background-color 0.5s, color 0.5s;
 }
 
 .bar-item:hover {
     color: #ffffff;
-    background-color: #7161ef;
+    background-color: #5630a8;
 }
 
 form {
-    margin: 2vw;
+    text-align: center;
+}
+
+form label {
+    color: white;
+    margin-bottom: 0.5vw;
+}
+
+form input {
+    border-radius: 5vw;
+    font-size: 1vw;
+    padding: 0.5vw;
+    text-align: center;
+    border: none;
+    width: 15vw;
+    margin: 0.3vw 0 1vw;
+    color: #5630a8;
+    font-weight: 500;
+    box-shadow: 0px 0px 1vw #00000050;
+}
+
+.form-button {
+    border-radius: 100vw;
+    font-size: 1vw;
+    border: none;
+    padding: 0vw 0.5vw;
 }
 
 .rating-form {
     margin: 0;
 }
 
+.form-title {
+    color: white;
+    text-align: center;
+    margin-top: 10vw;
+    margin-bottom: 1vw;
+}
+
 .input-description {
     size: 50;
+}
+
+.login {
+    display: flex;
+    justify-content: space-between;
+}
+
+.login div {
+    background-color: white;
+    height: 90vh;
+    border-radius: 2vw;
+    padding: 1vw;
+    text-align: center;
+}
+
+.login button {
+    margin-top: 0.5vw;
+    border: none;
+    line-height: 0;
+    padding: 1.4vw 1.5vw;
+}
+
+.login h1 {
+    margin-top: 25vh;
+}
+
+.login label {
+    color: #5630a8;
+}
+
+.login p {
+    color: #5630a8;
+}
+
+.main-login {
+    width: 61.66vw;
+}
+
+.side-login {
+    width: 29.83vw;
+}
+
+.side-login h1 {
+    margin-top: 35vh;
+}
+
+.signup-login h1 {
+    margin-top: 22vh;
 }
 
 .pfp {
     object-fit: cover;
     border-radius: 1000px;
-    height: 3.5vw;
-    width: 3.5vw;
-}
-
-.centered-pfp {
-    margin-top: 0.8vw;
-    width: 10vw;
-    height: 10vw;
-    margin-left: 45vw;
+    box-shadow: 0px 0px 1vw #00000050;
 }
 
 .profile {
@@ -98,8 +217,10 @@ form {
     font-family: Dosis;
     font-size: 1.3vw;
     margin-bottom: 0.5vw;
-    color: #7161ef;
+    color: #5630a8;
     background-color: #ffffff;
+    box-shadow: 0px 0px 1vw #00000050;
+
 }
 
 .profile img {
@@ -119,8 +240,66 @@ form {
     justify-content: space-between;
 }
 
+.account-boxes {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 3vw;
+}
+
+.accbox {
+    width: 31vw;
+    padding: 0.5vw 0 2vw 0;
+    background-color: #ffffff;
+    border-radius: 2vw;
+    text-align: center;
+}
+
+.accbox p, h1, a {
+    color: #5630a8;
+    margin: 1vw 0;
+}
+
+.centre-accbox {
+    padding-top: 2vw;
+}
+
+.centre-accbox img {
+    margin-top: 0 auto;
+    width: 10vw;
+    height: 10vw;
+}
+
+.left-accbox form {
+    margin-top: 8.5vw;
+}
+
+input[type="file"] {
+    display: none;
+}
+
+.left-accbox label {
+    font-size: 1.5vw;
+    padding: 8vw 10vw;
+    box-shadow: none;
+    border: 0.3vw dashed #5630a8;
+}
+
+.box {
+    background-color: white;
+    border-radius: 2vw;
+    text-align: center;
+    padding: 1vw;
+    margin: 25vh auto 0 auto;
+    width: 50vw;
+}
+
+.conf-message {
+    font-weight: 600;
+    color: #5630a8;
+}
+
 .vertical-divider {
-    border-left: 0.25vw solid #7161ef;
+    border-left: 0.25vw solid #5630a8;
     border-radius: 100vw;
     margin: 0 1vw 0 1vw;
 }
@@ -129,33 +308,59 @@ form {
     color: red;
 }
 
+.important.button:hover {
+    background-color: red;
+}
+
 .topics-header {
     display: flex;
     justify-content: space-between;
 }
 
-.addtopic-button {
-    margin-top: 1.3vw;
-    height: 3vw;
+.topics-title {
+    margin-bottom: 2vw;
 }
 
-.rate-button {
-    font-size: 1vw;
+.topics-title h1 {
+    color: white;
+    text-align: left;
+    margin-bottom: 0;
 }
 
-.button {
-    padding: 0 1.5vw;
-    font-weight: 700;
-    background-color: #ffffff;
-    border-radius: 2vw;
-    line-height: 3vw;
-    text-decoration: none;
-    color: #7161ef;
+.topics-title p {
+    margin-top: 0.5vw;
 }
 
-.button:hover {
+.topic-items span {
+    display: inline-block;
+    padding: 0.3vw 0.6vw;
+    margin: 0 0.5vw 0.6vw 0;
+    white-space: pre;
     color: #ffffff;
-    background-color: #7161ef;
+    background-color: #5630a8;
+    border-radius: 25vw;
+    box-shadow: 0px 0px 1vw #00000050;
+}
+
+.add-button {
+    padding: 0 0.75vw 0.3vw 0.75vw;
+    font-size: 1.5vw;
+}
+
+.button-icon {
+    margin: 0.5vw 0.8vw;
+    line-height: 3vw;
+}
+
+.button-icon svg {
+    fill: #5630a8;
+    width: 50px;
+    height: 50px;
+}
+
+.deltopic-button {
+    margin-left: 44.5vw;
+    font-size: 1vw;
 }
 
 .add-text {
@@ -185,20 +390,9 @@ form {
     padding-left: 0.5vw;
 }
 
-.button-icon {
-    margin-left: 3vw;
-    line-height: 3vw;
-}
-
-.button-icon svg {
-    background-color: aqua;
-    fill: #7161ef;
-    width: 50px;
-    height: 50px;
-}
-
 .topic-description {
     margin-top: 0;
+    color: #5630a8;
 }
 
 .topic-title {
@@ -206,31 +400,71 @@ form {
     margin-bottom: 0vw;
 }
 
-table {
-    color: #333;
-    background: white;
-    border: 1px solid grey;
-    font-size: 12pt;
-    border-collapse: collapse;
+.welcome {
+    text-align: center;
+    margin-top: 35vh;
 }
 
-table thead th,
-table tfoot th {
-    color: black;
-    background: rgba(0, 0, 0, .1);
+.welcome h1, p {
+    color: white;
+}
+
+.big {
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    transform-origin: top;
+    background-color: #ffffff;
+    animation: bigAnim 2s forwards;
+    top: 0;
+    left: 0;
+}
+
+@keyframes bigAnim {
+    0%,
+    50% {
+        transform: scaleY(1);
+    }
+    100% {
+        transform: scaleY(0);
+    }
+}
+
+.items-table p {
+    color: #5630a8;
+}
+
+table {
+    margin: 0 1vw;
+    color: #5630a8;
+    background: white;
+    border: 0px solid white;
+    font-size: 12pt;
+    border-collapse: separate;
+    border-radius: 2vw;
+    border-spacing: 0 0.5vw;
 }
 
 table caption {
     padding: .5em;
 }
 
+table tr {
+    margin-bottom: 10vw;
+}
+
 table th,
 table td {
     padding: .5em;
-    border: 1px solid lightgrey;
+    border-radius: 2vw;
     width: 33vw;
     height: 2vw;
     text-align: center;
+}
+
+table tr {
+    border: 5px solid #5630a8;
+    border-radius: 2vw;
 }
 
 table p,
@@ -244,6 +478,15 @@ table label {
 input[name="itemname"] {
     text-align: center;
     font-size: larger;
+}
+
+.input-col button, input {
+    font-size: 1vw;
+    padding: 0;
+    height: 2vw;
+    width: 5vw;
+    border: none;
+    line-height: 0;
 }
 
 
@@ -283,6 +526,12 @@ input[name="itemname"] {
     position: relative;
     width: 1.5vw;
     font-size: 2vw;
-    color: #000000;
+    color: #5630a8;
     cursor: pointer;
+}
+
+/* remove scrollbar */
+
+::-webkit-scrollbar {
+    width: 0;
 }

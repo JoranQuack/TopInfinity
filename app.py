@@ -15,7 +15,7 @@ app = Flask(__name__, template_folder="templates")
 app.secret_key = 'mysecretkey'
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024
-app.config['UPLOAD_EXTENSIONS'] = ['.jpeg', '.jpg', '.png', '.gif']
+app.config['UPLOAD_EXTENSIONS'] = ['.jpeg', '.jpg', '.png', '.gif', 'JPG']
 
 
 def allowed_file(filename):
@@ -92,7 +92,7 @@ def home():
         items = cursor.fetchall()
         topic = topic + (tuple(list_items(items)), )
         topics[i] = topic
-    return render_template('home.html', topics=topics)
+    return render_template('home.html', topics=topics, enumerate=enumerate)
 
 @app.get("/")
 def checkcreds():
@@ -124,7 +124,7 @@ def checkcreds():
             error = "Username does not exist."
             return render_template('signin.html', error=error)
     else:
-        error = "You are not signed in."
+        error = "To get started, please sign in."
         return render_template('welcome.html', error=error)
 
 
@@ -361,6 +361,7 @@ def rate(itemid):
 @app.post('/additem')
 def additem():
     name = request.form['itemname'].capitalize()
+    name = name.strip()
     error = character_limit(name, 50)
     cursor = get_db().cursor()
     sql = "SELECT name FROM items WHERE topicid = ?"

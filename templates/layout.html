@@ -9,7 +9,7 @@
     <title>Top Infinity</title>
 </head>
 
-<body>
+<body onload="document.body.style.opacity='1'">
     <div class="bar">
         <a href="{{url_for('home')}}" class="bar-item">TopInfinity</a>
         <a href="{{url_for('account')}}"><img src="{{url_for('static', filename='pfps/'+session['pfp'])}}"

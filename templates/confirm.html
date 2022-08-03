@@ -1,12 +1,11 @@
 {% extends "layout.html" %}
 {% block content %}
 
-
-<p>{{message}}</p>
-<p class="important">This action cannot be undone.</p>
-<a href="{{url_for(function, confirmed=True)}}">{{action}}</a>
-<br>
-<a href="{{url_for('checkcreds')}}">Cancel</a>
-
+<div class="box">
+    <p class="conf-message">{{message}}</p>
+    <p class="important">This action cannot be undone.</p>
+    <a class="important button" href="{{url_for(function, confirmed=True)}}">{{action}}</a>
+    <a class="button" href="{{url_for('checkcreds')}}">Cancel</a>
+</div>
 
 {%endblock%}

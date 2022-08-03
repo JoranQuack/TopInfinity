@@ -1,17 +1,18 @@
 {% extends "layout.html" %}
 {% block content %}
 
+<h1 class="form-title">Edit Topic</h1>
 <form action="/edittopic" method="post">
-    <label for="title">New Title</label>
-    <input type="text" value="{{topics[0][2]}}" name="title" required>
+    <label for="title">New Title</label> <br>
+    <input type="text" value="{{topics[0][2]}}" name="title" required> <br>
 
-    <label for="description">New Description</label>
-    <input type="text" value="{{topics[0][3]}}" size="50" name="description" class="input-description" required>
+    <label for="description">New Description</label> <br>
+    <input type="text" value="{{topics[0][3]}}" size="50" name="description" class="input-description" required> <br>
 
-    <button type="submit">Update Topic</button>
+    <button class="button form-button" type="submit">Update Topic</button> <br>
     <p class="important">{{error}}</p>
 </form>
 
-<a href="{{url_for('deletetopic', confirmed='False')}}">Delete Topic</a>
+<a class="important button deltopic-button" href="{{url_for('deletetopic', confirmed='False')}}">Delete Topic</a>
 
 {% endblock %}
