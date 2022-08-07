@@ -2,32 +2,32 @@
 <html lang="en">
 
 <head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="{{url_for('static',filename='styles.css')}}">
-    <title>Top Infinity</title>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="{{url_for('static', filename='styles.css')}}">
+  <title>Top Infinity</title>
 </head>
 
 <body onload="document.body.style.opacity='1'">
-    <div class="bar">
-        <a href="{{url_for('home')}}" class="bar-item">TopInfinity</a>
-        <a href="{{url_for('account')}}"><img src="{{url_for('static', filename='pfps/'+session['pfp'])}}"
-                class="bar-pfp pfp"></img></a>
-    </div>
-    {% block content %}
-    {% endblock %}
+  <div class="bar">
+    <a href="{{url_for('home')}}" class="bar-item">TopInfinity</a>
+    <a href="{{url_for('account')}}"><img src="{{url_for('static', filename='pfps/'+session['pfp'])}}"
+        class="bar-pfp pfp"></img></a>
+  </div>
+  {% block content %}
+  {% endblock %}
 
-    <script>
-        document.addEventListener("DOMContentLoaded", function (event) {
-          var scrollpos = localStorage.getItem("scrollpos");
-          if (scrollpos) window.scrollTo(0, scrollpos);
-        });
-      
-        window.onscroll = function (e) {
-          localStorage.setItem("scrollpos", window.scrollY);
-        };
-      </script>
+  <script>
+    document.addEventListener("DOMContentLoaded", function (event) {
+      var scrollpos = localStorage.getItem("scrollpos");
+      if (scrollpos) window.scrollTo(0, scrollpos);
+    });
+
+    window.onscroll = function (e) {
+      localStorage.setItem("scrollpos", window.scrollY);
+    };
+  </script>
 
 </body>
 

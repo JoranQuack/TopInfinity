@@ -47,6 +47,10 @@ h3 {
     margin-left: 1vw;
 }
 
+button {
+    cursor: pointer;
+}
+
 .button {
     padding: 0.5vw 1.5vw;
     font-weight: 700;
@@ -55,13 +59,14 @@ h3 {
     line-height: 3vw;
     text-decoration: none;
     color: #5630a8;
+    fill: #5630a8;
     box-shadow: 0px 0px 1vw #00000050;
     transition: background-color 0.5s, color 0.5s, fill 0.5s;
 }
 
 .button:hover {
     color: #ffffff;
-    fill: rgb(255, 255, 255);
+    fill: #ffffff;
     background-color: #5630a8;
 }
 
@@ -74,6 +79,23 @@ h3 {
 
 .rate-button {
     font-size: 1vw;
+}
+
+.edit-button {
+    height: 3vw;
+    width: 3vw;
+    background-color: white;
+    color: none;
+    border: none;
+    padding: 0.2vw;
+    line-height: 0;
+    cursor: pointer;
+    float: right;
+    margin-top: 0.5vw;
+}
+
+.edit-button svg:hover {
+    fill: #ffffff;
 }
 
 .bar {
@@ -91,12 +113,12 @@ h3 {
     transition: opacity 0.5s;
 }
 
-.bar-pfp:hover{
+.bar-pfp:hover {
     opacity: 50%;
 }
 
 .bar-item {
-    border-radius: 25vw;
+    border-radius: 1000px;
     font-size: 2vw;
     font-weight: 999;
     margin-top: 0;
@@ -350,12 +372,11 @@ input[type="file"] {
 .button-icon {
     margin: 0.5vw 0.8vw;
     line-height: 3vw;
+
 }
 
 .button-icon svg {
     fill: #5630a8;
-    width: 50px;
-    height: 50px;
 }
 
 .deltopic-button {
@@ -421,10 +442,12 @@ input[type="file"] {
 }
 
 @keyframes bigAnim {
+
     0%,
     50% {
         transform: scaleY(1);
     }
+
     100% {
         transform: scaleY(0);
     }
