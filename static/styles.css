@@ -117,7 +117,7 @@ button {
     opacity: 50%;
 }
 
-.bar-item {
+.bar p {
     border-radius: 1000px;
     font-size: 2vw;
     font-weight: 999;
@@ -127,9 +127,20 @@ button {
     transition: background-color 0.5s, color 0.5s;
 }
 
-.bar-item:hover {
-    color: #ffffff;
-    background-color: #5630a8;
+.home-button {
+    margin: -0.6vw 0 0 0.6vw;
+    height: 3.5vw;
+    width: 3.5vw;
+    fill: #5630a8;
+    padding: 0.2vw;
+    line-height: 0;
+    box-shadow: none;
+    border-radius: 1000px;
+    transition: opacity 0.5s;
+}
+
+.home-button:hover {
+    opacity: 50%;
 }
 
 form {
@@ -364,15 +375,24 @@ input[type="file"] {
     box-shadow: 0px 0px 1vw #00000050;
 }
 
-.add-button {
+.topic-items h3 {
+    margin-bottom: 0.5vw;
+}
+
+.topic-items p {
+    color: #5630a8;
+    margin: 0 0 0.5vw 0;
+}
+
+.topic-items a {
     padding: 0 0.75vw 0.3vw 0.75vw;
     font-size: 1.5vw;
+    margin-top: 0;
 }
 
 .button-icon {
     margin: 0.5vw 0.8vw;
     line-height: 3vw;
-
 }
 
 .button-icon svg {
