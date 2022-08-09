@@ -65,7 +65,7 @@
                     <p>{{user[4]}}</p>
                 </th>
                 <th>
-                    <a class="button-icon" href="{{url_for('admin_deleteuser', userid=user[0])}}">
+                    <a class="button-icon" href="{{url_for('delete_account', userid=user[0])}}">
                         <img class="button-icon"
                             src="{{url_for('static', filename='/websitecomponents/icon-delete.png')}}">
                     </a>
@@ -113,7 +113,7 @@
                     <p>{{topic[3]}}</p>
                 </th>
                 <th>
-                    <a class="button-icon" href="{{url_for('admin_deletetopic', topicid=topic[0])}}">
+                    <a class="button-icon" href="{{url_for('delete_topic', topicid=topic[0])}}">
                         <img class="button-icon"
                             src="{{url_for('static', filename='/websitecomponents/icon-delete.png')}}">
                     </a>
@@ -167,7 +167,7 @@
                     <p>{{item[4]}}</p>
                 </th>
                 <th>
-                    <a class="button-icon" href="{{url_for('deleteitem', itemid=item[0])}}">
+                    <a class="button-icon" href="{{url_for('delete_item', itemid=item[0])}}">
                         <img class="button-icon"
                             src="{{url_for('static', filename='/websitecomponents/icon-delete.png')}}">
                     </a>

@@ -60,6 +60,50 @@ def character_limit(check, number):
     return error
 
 
+def delete_account(userid):
+    cursor = get_db().cursor()
+    sql = "DELETE FROM users WHERE id=?"
+    cursor.execute(sql, (userid, ))
+    get_db().commit()
+    session.clear()
+    cursor = get_db().cursor()
+    sql = "DELETE FROM user_ratings WHERE userid=?"
+    cursor.execute(sql, (userid, ))
+    get_db().commit()
+    cursor = get_db().cursor()
+    sql = "SELECT id FROM topics WHERE userid = ?"
+    cursor.execute(sql, (userid,))
+    topics = cursor.fetchall()
+    list_items(topics)
+    for topic in topics:
+        delete_item(topic)
+
+
+def delete_topic(topicid):
+    cursor = get_db().cursor()
+    sql = "DELETE FROM topics WHERE id=?"
+    cursor.execute(sql, (topicid, ))
+    get_db().commit()
+    cursor = get_db().cursor()
+    sql = "SELECT id FROM items WHERE topicid = ?"
+    cursor.execute(sql, (topicid,))
+    items = cursor.fetchall()
+    list_items(items)
+    for item in items:
+        delete_item(item)
+
+
+def delete_item(itemid):
+    cursor = get_db().cursor()
+    sql = "DELETE FROM items WHERE id=?"
+    cursor.execute(sql, (itemid, ))
+    get_db().commit()
+    cursor = get_db().cursor()
+    sql = "DELETE FROM user_ratings WHERE itemid=?"
+    cursor.execute(sql, (itemid, ))
+    get_db().commit()
+
+
 @app.route("/home")
 def home():
     cursor = get_db().cursor()
@@ -93,6 +137,7 @@ def home():
         topic = topic + (tuple(list_items(items)), )
         topics[i] = topic
     return render_template('home.html', topics=topics, enumerate=enumerate)
+
 
 @app.get("/")
 def checkcreds():
@@ -223,35 +268,37 @@ def logout():
     return redirect(url_for('checkcreds'))
 
 
-@app.get('/deleteacc/<confirmed>')
-def deleteacc(confirmed):
+@app.get('/userdelete_account/<confirmed>')
+def userdelete_account(confirmed):
     if confirmed == "True":
-        cursor = get_db().cursor()
-        sql = "DELETE FROM users WHERE id=?"
-        cursor.execute(sql, (session['userid'], ))
-        get_db().commit()
-        session.clear()
+        delete_account(session['userid'])
         return redirect(url_for('checkcreds'))
     else:
         message = "Are you sure you would like to delete your account?"
         action = "Delete Account"
-        function = "deleteacc"
+        function = "userdelete_account"
         return render_template('confirm.html', message=message, action=action, function=function)
 
 
-@app.get('/deletetopic/<confirmed>')
-def deletetopic(confirmed):
+@app.get('/userdelete_topic/<confirmed>')
+def userdelete_topic(confirmed):
     if confirmed == "True":
-        cursor = get_db().cursor()
-        sql = "DELETE FROM topics WHERE id=?"
-        cursor.execute(sql, (session['topicid'], ))
-        get_db().commit()
+        delete_topic(session['topicid'])
         return redirect(url_for('checkcreds'))
     else:
         message = "Are you sure you would like to delete this topic and all of its items?"
         action = "Delete Topic"
-        function = "deletetopic"
+        function = "userdelete_topic"
         return render_template('confirm.html', message=message, action=action, function=function)
+
+
+@app.get('/userdelete_item/<int:itemid>')
+def userdelete_item(itemid):
+    delete_item(itemid)
+    try:
+        return redirect(url_for('topic', topicid=session['topicid']))
+    except:
+        return redirect(url_for('admin'))
 
 
 @app.get('/addtopic')
@@ -376,22 +423,6 @@ def additem():
     return redirect(url_for('topic', topicid=session['topicid']))
 
 
-@app.get('/deleteitem/<int:itemid>')
-def deleteitem(itemid):
-    cursor = get_db().cursor()
-    sql = "DELETE FROM items WHERE id=?"
-    cursor.execute(sql, (itemid, ))
-    get_db().commit()
-    cursor = get_db().cursor()
-    sql = "DELETE FROM user_ratings WHERE itemid=?" 
-    cursor.execute(sql, (itemid, ))
-    get_db().commit()
-    try:
-        return redirect(url_for('topic', topicid=session['topicid']))
-    except:
-        return redirect(url_for('admin'))
-
-
 @app.get('/admin')
 def admin():
     if session['userid'] != 44:
@@ -411,24 +442,5 @@ def admin():
     return render_template('admin.html', users=users, topics=topics, items=items)
 
 
-@app.get('/admin_deleteuser/<int:userid>')
-def admin_deleteuser(userid):
-    cursor = get_db().cursor()
-    sql = "DELETE FROM users WHERE id=?"
-    cursor.execute(sql, (userid, ))
-    get_db().commit()
-    return redirect(url_for('admin'))
-
-
-@app.get('/admin_deletetopic/<int:topicid>')
-def admin_deletetopic(topicid):
-    cursor = get_db().cursor()
-    sql = "DELETE FROM topics WHERE id=?"
-    cursor.execute(sql, (topicid, ))
-    get_db().commit()
-    return redirect(url_for('admin'))
-
-
 if __name__ == "__main__":
     app.run(debug=True)
-

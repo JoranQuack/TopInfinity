@@ -486,6 +486,7 @@ table {
     border-collapse: separate;
     border-radius: 2vw;
     border-spacing: 0 0.5vw;
+    width: 95vw;
 }
 
 table caption {
