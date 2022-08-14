@@ -42,24 +42,22 @@ def list_items(results):
     return results
 
 
-def add_check(title, description):
-    if title.replace(' ', '').isalpha() == False:
+def letter_check(check):
+    error = "none"
+    if check.replace(' ', '').isalpha() == False:
         error = "Title must only include letters"
-    elif description.replace(' ', '').isalpha() == False:
-        error = "Description must only include letters"
-    else:
-        error = "none"
     return error
 
 
 def character_limit(check, number):
     if len(check) > number:
-        error = "Input is too long"
+        error = f"Character limit is {number}."
     else:
         error = "none"
     return error
 
 
+@app.post("/delete_account/<int:userid>")
 def delete_account(userid):
     cursor = get_db().cursor()
     sql = "DELETE FROM users WHERE id=?"
@@ -77,8 +75,10 @@ def delete_account(userid):
     list_items(topics)
     for topic in topics:
         delete_item(topic)
+    return redirect(url_for('checkcreds'))
 
 
+@app.post("/delete_topic/<int:topicid>")
 def delete_topic(topicid):
     cursor = get_db().cursor()
     sql = "DELETE FROM topics WHERE id=?"
@@ -91,8 +91,10 @@ def delete_topic(topicid):
     list_items(items)
     for item in items:
         delete_item(item)
+    return redirect(url_for('checkcreds'))
 
 
+@app.post("/delete_item/<int:itemid>")
 def delete_item(itemid):
     cursor = get_db().cursor()
     sql = "DELETE FROM items WHERE id=?"
@@ -102,6 +104,10 @@ def delete_item(itemid):
     sql = "DELETE FROM user_ratings WHERE itemid=?"
     cursor.execute(sql, (itemid, ))
     get_db().commit()
+    try:
+        return redirect(url_for('topic', topicid=session['topicid']))
+    except:
+        return redirect(url_for('admin'))
 
 
 @app.route("/home")
@@ -182,38 +188,33 @@ def signup_post():
     password = h.hexdigest()
     error = character_limit(username, 20)
     error = character_limit(email, 30)
-    if error != "none":
-        return render_template('signup.html', error=error)
+    error = letter_check(username)
     cursor = get_db().cursor()
     sql = "SELECT username FROM users"
     cursor.execute(sql)
-    results = cursor.fetchall()
-    list_items(results)
-    if username not in results:
-        cursor = get_db().cursor()
-        sql = "SELECT email FROM users"
-        cursor.execute(sql)
-        results = cursor.fetchall()
-        list_items(results)
-        if email not in results:
-            if (re.search(regex, email)):
-                cursor = get_db().cursor()
-                sql = "INSERT INTO users(username,password,pfp, email) VALUES(?,?,?,?)"
-                cursor.execute(sql, (username, password, "default.png", email))
-                get_db().commit()
-                session['username'] = username
-                session['password'] = password
-                session['email'] = email
-                return redirect(url_for('checkcreds'))
-            else:
-                error = "Email is invalid."
-                return render_template('signup.html', error=error)
-        else:
-            error = "Email is already in use."
-            return render_template('signup.html', error=error)
-    else:
+    usernames = cursor.fetchall()
+    list_items(usernames)
+    print(usernames)
+    if username in usernames:
         error = "Username is already in use, please choose something else."
+    cursor = get_db().cursor()
+    sql = "SELECT email FROM users"
+    cursor.execute(sql)
+    emails = cursor.fetchall()
+    list_items(emails)
+    if (re.search(regex, email)):
+        if email in emails:
+            error = "Email is already in use."
+    else:
+        error = "Email is invalid."
+    if error: 
         return render_template('signup.html', error=error)
+    cursor = get_db().cursor()
+    sql = "INSERT INTO users(username, password, pfp, email) VALUES(?,?,?,?)"
+    cursor.execute(sql, (username, password, "default.png", email))
+    get_db().commit()
+    error = "Account has been created, please sign in."
+    return render_template('signin.html', error=error)
 
 
 @app.get("/signup")
@@ -271,8 +272,7 @@ def logout():
 @app.get('/userdelete_account/<confirmed>')
 def userdelete_account(confirmed):
     if confirmed == "True":
-        delete_account(session['userid'])
-        return redirect(url_for('checkcreds'))
+        return delete_account(session['userid'])
     else:
         message = "Are you sure you would like to delete your account?"
         action = "Delete Account"
@@ -283,8 +283,7 @@ def userdelete_account(confirmed):
 @app.get('/userdelete_topic/<confirmed>')
 def userdelete_topic(confirmed):
     if confirmed == "True":
-        delete_topic(session['topicid'])
-        return redirect(url_for('checkcreds'))
+        return delete_topic(session['topicid'])
     else:
         message = "Are you sure you would like to delete this topic and all of its items?"
         action = "Delete Topic"
@@ -294,11 +293,7 @@ def userdelete_topic(confirmed):
 
 @app.get('/userdelete_item/<int:itemid>')
 def userdelete_item(itemid):
-    delete_item(itemid)
-    try:
-        return redirect(url_for('topic', topicid=session['topicid']))
-    except:
-        return redirect(url_for('admin'))
+    return delete_item(itemid)
 
 
 @app.get('/addtopic')
@@ -312,7 +307,7 @@ def addtopic_post():
     description = request.form['description']
     error = character_limit(title, 30)
     error = character_limit(description, 130)
-    error = add_check(title, description)
+    error = letter_check(title)
     if error == "none":
         cursor = get_db().cursor()
         sql = "INSERT INTO topics(userid, title, description) VALUES(?,?,?)"
@@ -339,7 +334,7 @@ def edittopic_post():
     description = request.form['description']
     error = character_limit(title, 30)
     error = character_limit(description, 130)
-    error = add_check(title, description)
+    error = letter_check(title)
     if error == "none":
         cursor = get_db().cursor()
         sql = "UPDATE topics SET title = ?, description = ?  WHERE id = ?"
@@ -425,7 +420,7 @@ def additem():
 
 @app.get('/admin')
 def admin():
-    if session['userid'] != 44:
+    if session['userid'] != 76:
         return redirect(url_for('checkcreds'))
     cursor = get_db().cursor()
     sql = "SELECT * FROM users"

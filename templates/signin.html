@@ -2,25 +2,35 @@
 {% block content %}
 
 <div class="login">
-    <div class="main-login">
-        <h1>Sign In to an Existing Account</h1>
-        <form action="/signin" method="post">
-            <label for="username">Username</label> <br>
-            <input type="text" placeholder="Enter Username" name="username" required> <br>
 
-            <label for="password">Password</label> <br>
-            <input type="password" placeholder="Enter Password" name="password" required> <br>
+    <div class="main-login login-area">
+        <div class="login-content">
+            <h1>Sign In to an Existing Account</h1>
+            <form action="/signin" method="post">
+                <label for="username">Username</label> <br>
+                <input type="text" placeholder="Enter Username" name="username" required> <br>
 
-            <button type="submit" class="button">Sign In</button>
-            <p class="important">{{error}}</p>
-        </form>
+                <label for="password">Password</label> <br>
+                <input type="password" placeholder="Enter Password" name="password" required> <br>
+
+                <button type="submit" class="button">Sign In</button>
+            </form>
+        </div>
     </div>
 
-    <div class="side-login">
-        <h1>Create a New Account</h1>
-        <p>Don't have an account?</p>
-        <a href="{{url_for('signup')}}" class="button">Sign Up</a>
+    <div class="side-login login-area">
+        <div class="login-content">
+            <h1>Create a New Account</h1>
+            <p>Don't have an account?</p>
+            <a href="{{url_for('signup')}}" class="button">Sign Up</a>
+        </div>
     </div>
 </div>
+
+{%if error%}
+    <div class="error">
+        <p>{{error}}</p>
+    </div>
+{%endif%}
 
 {% endblock %}

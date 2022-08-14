@@ -2,27 +2,37 @@
 {% block content %}
 
 <div class="login">
-    <div class="side-login">
-        <h1>Sign In to Existing Account</h1>
-        <p>Already have an account?</p>
-        <a href="{{url_for('signin')}}" class="button">Sign In</a>
+
+    <div class="side-login login-area">
+        <div class="login-content">
+            <h1>Sign In to Existing Account</h1>
+            <p>Already have an account?</p>
+            <a href="{{url_for('signin')}}" class="button">Sign In</a>
+        </div>
     </div>
-    <div class="main-login signup-login">
-        <h1>Create Your Account</h1>
-        <form action="/signup" method="post">
-            <label for="username">Username</label> <br>
-            <input type="text" placeholder="Enter Username" name="username" required> <br>
 
-            <label for="password">Password</label> <br>
-            <input type="password" placeholder="Enter Password" name="password" required> <br>
+    <div class="main-login login-area">
+        <div class="login-content">
+            <h1>Create Your Account</h1>
+            <form action="/signup" method="post">
+                <label for="username">Username</label> <br>
+                <input type="text" placeholder="Enter Username" name="username" required> <br>
 
-            <label for="email">Email</label> <br>
-            <input type="text" placeholder="Enter Email" name="email" required> <br>
+                <label for="password">Password</label> <br>
+                <input type="password" placeholder="Enter Password" name="password" required> <br>
 
-            <button type="submit" class="button">Sign Up</button>
-            <p class="important">{{error}}</p>
-        </form>
+                <label for="email">Email</label> <br>
+                <input type="text" placeholder="Enter Email" name="email" required> <br>
+
+                <button type="submit" class="button">Sign Up</button>
+            </form>
+        </div>
     </div>
+    
 </div>
+
+{%if error%}
+    <p class="error important">{{error}}</p>
+{%endif%}
 
 {% endblock %}

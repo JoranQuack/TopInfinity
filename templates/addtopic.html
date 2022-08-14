@@ -11,6 +11,11 @@
 
     <button type="submit" class="button form-button">Create Topic</button>
 </form>
-<p class="important">{{error}}</p>
+
+{%if error%}
+    <div class="error">
+        <p>{{error}}</p>
+    </div>
+{%endif%}
 
 {% endblock %}

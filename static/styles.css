@@ -8,11 +8,9 @@ body {
     margin: 0vw;
     padding: 1.5vw;
     background-color: #5630a8;
-    opacity: 0;
-    transition: opacity 0.5s;
 }
 
-a, p, h1, h2, h3, li, b, label, span, title, input, button, ul, li, dl {
+a, p, h1, h2, h3, li, b, label, span, title, input, button, ul, li, dl, div {
     text-decoration: none;
     font-family: Dosis;
     font-size: 1.3vw;
@@ -190,14 +188,23 @@ form input {
 .login {
     display: flex;
     justify-content: space-between;
+    align-items: center;
 }
 
-.login div {
+.login-area {
     background-color: white;
-    height: 90vh;
+    height: 89vh;
     border-radius: 2vw;
     padding: 1vw;
     text-align: center;
+}
+
+.login-content {
+    padding: 1vw;
+    position: relative;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
 }
 
 .login button {
@@ -205,10 +212,6 @@ form input {
     border: none;
     line-height: 0;
     padding: 1.4vw 1.5vw;
-}
-
-.login h1 {
-    margin-top: 25vh;
 }
 
 .login label {
@@ -225,14 +228,6 @@ form input {
 
 .side-login {
     width: 29.83vw;
-}
-
-.side-login h1 {
-    margin-top: 35vh;
-}
-
-.signup-login h1 {
-    margin-top: 22vh;
 }
 
 .pfp {
@@ -339,6 +334,51 @@ input[type="file"] {
 
 .important {
     color: red;
+}
+
+.flashes {
+    background-color: red;
+    color: white;
+    border-radius: 1000px;
+    text-decoration: none;
+}
+
+.error p {
+    background-color: red;
+    color: white;
+    border-radius: 1000px;
+    padding: 1vw;
+    width: fit-content;
+    text-align: center;
+    box-shadow: 0px 0px 1vw #00000050;
+    margin: auto;
+    
+}
+
+.error {
+    animation: errorAnim 5s ease forwards;
+    position: fixed;
+    width: 97vw;
+    text-align: center;
+    top: 85%;
+    margin-left: 0;
+    transform: translate(-50%, -50%);
+    -ms-transform: translate(-50%, -50%);
+}
+
+@keyframes errorAnim {
+    0% {
+        transform: translateY(300%);
+    }
+    10% {
+        transform: translateY(0%);
+    }
+    90% {
+        transform: translateY(0%);
+    }
+    100% {
+        transform: translateY(300%);
+    }
 }
 
 .important.button:hover {
@@ -462,12 +502,10 @@ input[type="file"] {
 }
 
 @keyframes bigAnim {
-
     0%,
     50% {
         transform: scaleY(1);
     }
-
     100% {
         transform: scaleY(0);
     }

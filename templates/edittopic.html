@@ -10,9 +10,14 @@
     <input type="text" value="{{topics[0][3]}}" size="50" name="description" class="input-description" required> <br>
 
     <button class="button form-button" type="submit">Update Topic</button> <br>
-    <p class="important">{{error}}</p>
 </form>
 
 <a class="important button deltopic-button" href="{{url_for('userdelete_topic', confirmed='False')}}">Delete Topic</a>
+
+{%if error%}
+    <div class="error">
+        <p>{{error}}</p>
+    </div>
+{%endif%}
 
 {% endblock %}
