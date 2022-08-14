@@ -96,6 +96,10 @@ button {
     fill: #ffffff;
 }
 
+.left-accbox label {
+    cursor: pointer;
+}
+
 .bar {
     display: flex;
     justify-content: space-between;
@@ -567,10 +571,16 @@ input[name="itemname"] {
     padding: 0;
     height: 2vw;
     width: 5vw;
-    border: none;
+    border: none;   
     line-height: 0;
 }
 
+input,
+input::placeholder,
+input[type="text"]
+{
+    font-size: 1vw;
+}
 
 /* star rating visuals */
 

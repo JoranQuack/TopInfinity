@@ -181,6 +181,7 @@ def checkcreds():
 
 @app.post('/signup')
 def signup_post():
+    error = "none"
     username = request.form['username']
     password = request.form['password']
     email = request.form['email']
@@ -207,7 +208,7 @@ def signup_post():
             error = "Email is already in use."
     else:
         error = "Email is invalid."
-    if error: 
+    if error != "none":
         return render_template('signup.html', error=error)
     cursor = get_db().cursor()
     sql = "INSERT INTO users(username, password, pfp, email) VALUES(?,?,?,?)"
