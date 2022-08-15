@@ -167,6 +167,9 @@ def checkcreds():
                 session['email'] = results[0][4]
                 session['pfp'] = results[0][3]
                 session['userid'] = results[0][0]
+                session['color'] = "#5630a8"
+                if results[0][5]:
+                    session['color'] = results[0][5]
                 return redirect(url_for('home'))
             else:
                 error = "Incorrect password, please try again."
@@ -211,8 +214,8 @@ def signup_post():
     if error != "none":
         return render_template('signup.html', error=error)
     cursor = get_db().cursor()
-    sql = "INSERT INTO users(username, password, pfp, email) VALUES(?,?,?,?)"
-    cursor.execute(sql, (username, password, "default.png", email))
+    sql = "INSERT INTO users(username, password, pfp, email, color) VALUES(?,?,?,?)"
+    cursor.execute(sql, (username, password, "default.png", email, "#5630a8"))
     get_db().commit()
     error = "Account has been created, please sign in."
     return render_template('signin.html', error=error)
@@ -417,6 +420,16 @@ def additem():
         cursor.execute(sql, (name, 0, session['userid'], session['topicid']))
         get_db().commit()
     return redirect(url_for('topic', topicid=session['topicid']))
+
+
+@app.get('/colorchange/<hex>')
+def colorchange(hex):
+    session['color'] = hex
+    cursor = get_db().cursor()
+    sql = "UPDATE users SET color = ? WHERE id = ?"
+    cursor.execute(sql, (hex, session['userid']))
+    get_db().commit()
+    return redirect(url_for('account'))
 
 
 @app.get('/admin')

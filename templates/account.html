@@ -17,9 +17,22 @@
 		<p>Email: {{session['email']}}</p>
 		<a class="button" href="{{url_for('logout')}}">Log Out</a>
 	</div>
-	<div class="right-accbox accbox">
-		<h1>Delete your Account</h1>
-		<a href="{{url_for('userdelete_account', confirmed='False')}}" class="button important">Delete Account</a>
+	<div class="right-accbox">
+		<div class="color-accbox accbox">
+			<h1>Accent Colour</h1>
+			<div class="color-spots">
+				<a style="background-color: #5630a8" href="{{url_for('colorchange', hex='#5630a8')}}"></a>
+				<a style="background-color: #9030a8" href="{{url_for('colorchange', hex='#9030a8')}}"></a>
+				<a style="background-color: #d21f1f" href="{{url_for('colorchange', hex='#d21f1f')}}"></a>
+				<a style="background-color: #d86e11" href="{{url_for('colorchange', hex='#d86e11')}}"></a>
+				<a style="background-color: #198036" href="{{url_for('colorchange', hex='#198036')}}"></a>
+				<a style="background-color: #078dbd" href="{{url_for('colorchange', hex='#078dbd')}}"></a>
+			</div>
+		</div>
+		<div class="deleteacc-accbox accbox">
+			<h1>Delete your Account</h1>
+			<a href="{{url_for('userdelete_account', confirmed='False')}}" class="button important">Delete Account</a>
+		</div>
 	</div>
 </div>
 {% endblock %}
