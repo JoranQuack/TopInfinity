@@ -10,6 +10,7 @@ UPLOAD_FOLDER = 'static/pfps/'
 ALLOWED_EXTENSIONS = set(['png', 'jpg', 'jpeg', 'gif'])
 DATABASE = "topinfinity.db"
 
+
 regex = '(^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$)'
 app = Flask(__name__, template_folder="templates")
 app.secret_key = 'mysecretkey'
@@ -57,13 +58,12 @@ def character_limit(check, number):
     return error
 
 
-@app.post("/delete_account/<int:userid>")
+@app.route("/delete_account/<int:userid>")
 def delete_account(userid):
     cursor = get_db().cursor()
     sql = "DELETE FROM users WHERE id=?"
     cursor.execute(sql, (userid, ))
     get_db().commit()
-    session.clear()
     cursor = get_db().cursor()
     sql = "DELETE FROM user_ratings WHERE userid=?"
     cursor.execute(sql, (userid, ))
@@ -75,10 +75,13 @@ def delete_account(userid):
     list_items(topics)
     for topic in topics:
         delete_item(topic)
+    if request.method == "GET":
+        return redirect(url_for('admin'))
+    session.clear()
     return redirect(url_for('checkcreds'))
 
 
-@app.post("/delete_topic/<int:topicid>")
+@app.route("/delete_topic/<int:topicid>")
 def delete_topic(topicid):
     cursor = get_db().cursor()
     sql = "DELETE FROM topics WHERE id=?"
@@ -91,10 +94,12 @@ def delete_topic(topicid):
     list_items(items)
     for item in items:
         delete_item(item)
+    if request.method == "GET":
+        return redirect(url_for('admin'))
     return redirect(url_for('checkcreds'))
 
 
-@app.post("/delete_item/<int:itemid>")
+@app.route("/delete_item/<int:itemid>")
 def delete_item(itemid):
     cursor = get_db().cursor()
     sql = "DELETE FROM items WHERE id=?"
@@ -104,10 +109,9 @@ def delete_item(itemid):
     sql = "DELETE FROM user_ratings WHERE itemid=?"
     cursor.execute(sql, (itemid, ))
     get_db().commit()
-    try:
-        return redirect(url_for('topic', topicid=session['topicid']))
-    except:
+    if request.method == "GET":
         return redirect(url_for('admin'))
+    return redirect(url_for('topic', topicid=session['topicid']))
 
 
 @app.route("/home")
@@ -192,7 +196,6 @@ def signup_post():
     password = h.hexdigest()
     error = character_limit(username, 20)
     error = character_limit(email, 30)
-    error = letter_check(username)
     cursor = get_db().cursor()
     sql = "SELECT username FROM users"
     cursor.execute(sql)
@@ -214,7 +217,7 @@ def signup_post():
     if error != "none":
         return render_template('signup.html', error=error)
     cursor = get_db().cursor()
-    sql = "INSERT INTO users(username, password, pfp, email, color) VALUES(?,?,?,?)"
+    sql = "INSERT INTO users(username, password, pfp, email, color) VALUES(?,?,?,?, ?)"
     cursor.execute(sql, (username, password, "default.png", email, "#5630a8"))
     get_db().commit()
     error = "Account has been created, please sign in."
@@ -449,6 +452,10 @@ def admin():
     cursor.execute(sql)
     items = cursor.fetchall()
     return render_template('admin.html', users=users, topics=topics, items=items)
+
+@app.errorhandler(404)
+def error_404(error):
+    return render_template('404.html', error=error), 404
 
 
 if __name__ == "__main__":

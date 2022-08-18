@@ -10,6 +10,15 @@ body {
     background-color: var(--primary-color);
 }
 
+.errorpage-body h1{
+    font-size: 5vw;
+    margin-top: 0;
+}
+
+.errorpage-body p {
+    color: black;
+}
+
 a, p, h1, h2, h3, li, b, label, span, title, input, button, ul, li, dl, div {
     text-decoration: none;
     font-family: Dosis;
@@ -468,6 +477,16 @@ input[type="file"] {
     fill: var(--primary-color);
 }
 
+.delitem-button {
+    height: 1.5vw;
+}
+
+.delitem-button svg {
+    height: 2vw;
+    width: 2vw;
+    padding-top: 1.2vw;
+}
+
 .deltopic-button {
     margin-left: 44.5vw;
     font-size: 1vw;
@@ -571,7 +590,7 @@ table td {
     padding: .5em;
     border-radius: 2vw;
     width: 33vw;
-    height: 2vw;
+    height: 3.5vw;
     text-align: center;
 }
 
