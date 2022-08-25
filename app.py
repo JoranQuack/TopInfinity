@@ -1,3 +1,5 @@
+# --------------------------------------------- SETTING UP --------------------------------------------- #
+
 # IMPORTS
 from flask import Flask, render_template, g, request, redirect, url_for, session, flash
 from werkzeug.utils import secure_filename
@@ -22,6 +24,8 @@ app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024
 app.config['UPLOAD_EXTENSIONS'] = ['.jpeg', '.jpg', '.png', '.gif', 'JPG']
 
+
+# ------------------------------------------- BASIC FUNCTIONS ------------------------------------------- #
 
 # ALLOWED FILENAMES CONFIG
 def allowed_file(filename):
@@ -67,6 +71,8 @@ def character_limit(check, number):
         error = "none"
     return error
 
+
+# --------------------------------------------- APP ROUTING --------------------------------------------- #
 
 # DELETE ANY ACCOUNT
 @app.route("/delete_account/<int:userid>")
@@ -379,6 +385,7 @@ def edittopic(topicid):
     results = cursor.fetchall()
     return render_template('edittopic.html', topics=results)
 
+
 # ENTER EDITED TOPIC DETAILS INTO DATABASE
 @app.post('/edittopic')
 def edittopic_post():
@@ -527,6 +534,8 @@ def admin():
 def error_404(error):
     return render_template('404.html', error=error), 404
 
+
+# ------------------------------------------ RUNNING THE APP  ------------------------------------------ #
 
 # RUN THE APP
 if __name__ == "__main__":
