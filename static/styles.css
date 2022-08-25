@@ -672,3 +672,32 @@ input[type="text"] {
 ::-webkit-scrollbar {
     width: 0;
 }
+
+@media (max-width: 770px) {
+    
+    h1 {
+        font-size: 5vw;
+    }
+    
+    p {
+        font-size: 3vw;
+    }
+
+    .bar {
+        height: 20vw;
+    }
+
+    .bar p {
+        font-size: 0;
+    }
+
+    .home-button,
+    .bar-pfp {
+        height: 18.75vw;
+        width: 18.75vw;
+        margin-left: 1vw;
+        box-shadow: none;
+    }
+
+
+}
