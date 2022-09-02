@@ -8,10 +8,10 @@
             <h1>Sign In to an Existing Account</h1>
             <form action="/signin" method="post">
                 <label for="username">Username</label> <br>
-                <input type="text" placeholder="Enter Username" name="username" required> <br>
+                <input type="text" placeholder="Enter Username" name="username" value="{{session['username']}}"> <br>
 
                 <label for="password">Password</label> <br>
-                <input type="password" placeholder="Enter Password" name="password" required> <br>
+                <input type="password" placeholder="Enter Password" name="password"> <br>
 
                 <button type="submit" class="button">Sign In</button>
             </form>

@@ -4,10 +4,10 @@
 <h1 class="form-title">Enter Topic Details</h1>
 <form action="/addtopic" method="post">
     <label for="title">Topic Title</label> <br>
-    <input type="text" placeholder="Enter Title" name="title" class="small-field" required> <br>
+    <input type="text" placeholder="Enter Title" name="title" class="small-field" value="{{title}}"> <br>
 
     <label for="description">Topic Description</label> <br>
-    <input type="text" placeholder="Enter Description" name="description" class="big-field" rows="10" required> <br>
+    <input type="text" placeholder="Enter Description" name="description" class="big-field" rows="10" value="{{description}}"> <br>
 
     <button type="submit" class="button form-button">Create Topic</button>
 </form>

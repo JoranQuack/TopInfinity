@@ -105,6 +105,12 @@ button {
     fill: #ffffff;
 }
 
+.inline-edit {
+    height: 2vw;
+    width: 2vw;
+    margin-left: 0.5vw;
+}
+
 .bar {
     display: flex;
     justify-content: space-between;
@@ -440,6 +446,11 @@ input[type="file"] {
 
 .topics-title p {
     margin-top: 0.5vw;
+}
+
+.topics-title-editsection {
+    display: flex;
+    justify-content: flex-start;
 }
 
 .topic-items span {

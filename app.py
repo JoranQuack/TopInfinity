@@ -3,7 +3,6 @@
 # IMPORTS
 from flask import Flask, render_template, g, request, redirect, url_for, session, flash
 from werkzeug.utils import secure_filename
-from PIL import Image, ImageDraw, ImageFilter
 import sqlite3
 import hashlib
 import os
@@ -65,10 +64,17 @@ def letter_check(check):
 
 # FIND ERRORS IN USER INPUTS THAT ARE TOO LONG
 def character_limit(check, number):
+    error = "none"
     if len(check) > number:
-        error = f"Character limit is {number}."
-    else:
-        error = "none"
+        error = f"Character limit is {number}"
+    return error
+
+
+# CHECK FOR EMPTY INPUTS
+def empty(input, type):
+    error = "none"
+    if input.strip() == "":
+        error = f"Please enter a{type}"
     return error
 
 
@@ -182,39 +188,37 @@ def home():
 # SIGNIN (ALSO USED TO MAKE SURE USER IS LOGGED IN BEFORE RETURNING TO HOME.HTML)
 @app.get("/")
 def checkcreds():
-    if 'username' in session:
-        cursor = get_db().cursor()
-        sql = "SELECT username FROM users"
-        cursor.execute(sql)
-        results = cursor.fetchall()
-        list_items(results)
-        if session['username'] in results:
-            cursor = get_db().cursor()
-            sql = "SELECT password FROM users"
-            cursor.execute(sql)
-            results = cursor.fetchall()
-            list_items(results)
-            if session['password'] in results:
-                cursor = get_db().cursor()
-                sql = "SELECT * FROM users WHERE username = ?"
-                cursor.execute(sql, (session['username'], ))
-                results = cursor.fetchall()
-                session['email'] = results[0][4]
-                session['pfp'] = results[0][3]
-                session['userid'] = results[0][0]
-                session['color'] = "#5630a8"
-                if results[0][5]:
-                    session['color'] = results[0][5]
-                return redirect(url_for('home'))
-            else:
-                error = "Incorrect password, please try again."
-                return render_template('signin.html', error=error)
-        else:
-            error = "Username does not exist."
-            return render_template('signin.html', error=error)
-    else:
-        error = "To get started, please sign in."
-        return render_template('welcome.html', error=error)
+    error = "none"
+    if 'username' not in session:
+        return render_template('welcome.html')
+    print(session['password'])
+    cursor = get_db().cursor()
+    sql = "SELECT password FROM users"
+    cursor.execute(sql)
+    passwords = cursor.fetchall()
+    list_items(passwords)
+    if session['password'] not in passwords:
+        error = "Incorrect password, please try again"
+    cursor = get_db().cursor()
+    sql = "SELECT username FROM users"
+    cursor.execute(sql)
+    usernames = cursor.fetchall()
+    list_items(usernames)
+    if session['username'] not in usernames:
+        error = "Username does not exist"
+    if error != "none":
+        return render_template('signin.html', error=error)
+    cursor = get_db().cursor()
+    sql = "SELECT * FROM users WHERE username = ?"
+    cursor.execute(sql, (session['username'], ))
+    usercreds = cursor.fetchall()
+    session['email'] = usercreds[0][4]
+    session['pfp'] = usercreds[0][3]
+    session['userid'] = usercreds[0][0]
+    session['color'] = "#5630a8"
+    if usercreds[0][5]:
+        session['color'] = usercreds[0][5]
+    return redirect(url_for('home'))
 
 
 # RENDER SIGNIN PAGE AND PUT CREDS IN SESSION FOR ERROR CHECKING
@@ -226,7 +230,15 @@ def signin():
         h = hashlib.md5(password.encode())
         session['password'] = h.hexdigest()
         session['username'] = request.form['username']
-        return redirect(url_for('checkcreds'))
+        error2 = empty(password, " password")
+        error1 = empty(session['username'], " username")
+        if error1 != "none":
+            error = error1
+        elif error2 != "none":
+            error = error2
+        else:
+            return redirect(url_for('checkcreds'))
+        return render_template('signin.html', error=error)
     return render_template('signin.html')
 
 
@@ -250,7 +262,7 @@ def signup_post():
     usernames = cursor.fetchall()
     list_items(usernames)
     if username in usernames:
-        error = "Username is already in use, please choose something else."
+        error = "Username is already in use, please choose something else"
     # use regex to validate email
     cursor = get_db().cursor()
     sql = "SELECT email FROM users"
@@ -259,18 +271,27 @@ def signup_post():
     list_items(emails)
     if (re.search(regex, email)):
         if email in emails:
-            error = "Email is already in use."
+            error = "Email is already in use"
     else:
-        error = "Email is invalid."
+        error = "Email is invalid"
+    error2 = empty(email, "n email")
+    error3 = empty(password, " password")
+    error1 = empty(username, " username")
+    if error1 != "none":
+        error = error1
+    elif error2 != "none":
+        error = error2
+    elif error3 != "none":
+        error = error3
     # return to signup page with error if there are any
     if error != "none":
-        return render_template('signup.html', error=error)
+        return render_template('signup.html', error=error, username=username, email=email, password=password)
     # insert all credentials in the database and tell user to sign in again
     cursor = get_db().cursor()
-    sql = "INSERT INTO users(username, password, pfp, email, color) VALUES(?,?,?,?, ?)"
+    sql = "INSERT INTO users(username, password, pfp, email, color) VALUES(?,?,?,?,?)"
     cursor.execute(sql, (username, password, "default.png", email, "#5630a8"))
     get_db().commit()
-    error = "Account has been created, please sign in."
+    error = "Account has been created, please sign in"
     return render_template('signin.html', error=error)
 
 
@@ -357,6 +378,12 @@ def addtopic():
         error = character_limit(title, 30)
         error = character_limit(description, 130)
         error = letter_check(title)
+        error1 = empty(title, " title")
+        error2 = empty(description, " description")
+        if error1 != "none":
+            error = error1
+        elif error2 != "none":
+            error = error2
         if error == "none":
             cursor = get_db().cursor()
             sql = "INSERT INTO topics(userid, title, description) VALUES(?,?,?)"
@@ -368,7 +395,7 @@ def addtopic():
             topicid = cursor.fetchall()
             return redirect(url_for('topic', topicid=topicid[0][0]))
         else:
-            return render_template('addtopic.html', error=error)
+            return render_template('addtopic.html', error=error, title=title, description=description)
     # render the add topic page if not submitting a form
     else:
         return render_template('addtopic.html')
@@ -395,20 +422,26 @@ def edittopic_post():
     error = character_limit(title, 30)
     error = character_limit(description, 130)
     error = letter_check(title)
-    # go home if no error
+    error1 = empty(title, " title")
+    error2 = empty(description, " description")
+    if error1 != "none":
+        error = error1
+    elif error2 != "none":
+        error = error2
+    # update db if no error
     if error == "none":
         cursor = get_db().cursor()
         sql = "UPDATE topics SET title = ?, description = ?  WHERE id = ?"
         cursor.execute(sql, (title, description, session['topicid']))
         get_db().commit()
-        return redirect(url_for('home'))
+        return redirect(url_for('topic', topicid=session['topicid']))
     # go back to the edit topic page if there is an error and display
     else:
         cursor = get_db().cursor()
         sql = "SELECT * FROM topics WHERE id = ?"
         cursor.execute(sql, (session['topicid'], ))
-        results = cursor.fetchall()
-        return render_template('edittopic.html', topics=results, error=error)
+        topics = cursor.fetchall()
+        return render_template('edittopic.html', topics=topics, error=error)
 
 
 # SHOW TOPIC AND ALL OF ITS ITEMS
@@ -417,7 +450,7 @@ def topic(topicid):
     session['topicid'] = topicid
     # get all of the topic info and items (with their info)
     cursor = get_db().cursor()
-    sql = "SELECT topics.title, topics.description, users.username, users.pfp, topics.userid FROM topics JOIN users ON topics.userid = users.id WHERE topics.id = ?"
+    sql = "SELECT topics.title, topics.description, users.username, users.pfp, topics.userid, topics.id FROM topics JOIN users ON topics.userid = users.id WHERE topics.id = ?"
     cursor.execute(sql, (topicid, ))
     topics = cursor.fetchall()
     cursor = get_db().cursor()
@@ -442,7 +475,7 @@ def topic(topicid):
             item = item + (checked_numbers[0], )
         items[i] = item
     # manage errors
-    return render_template('topic.html', topics=topics, items=items, enumerate=enumerate, userid=session['userid'], error=session['error'])
+    return render_template('topic.html', topics=topics, items=items, enumerate=enumerate, error=session['error'])
 
 
 # SUBMIT A RATING FOR A SPECIFIC ITEM
@@ -474,21 +507,26 @@ def additem():
     # format item name to look nice
     name = request.form['itemname'].capitalize()
     name = name.strip()
-    error = character_limit(name, 50)
+    error = character_limit(name, 30)
     # make sure it's not already in the database
     cursor = get_db().cursor()
     sql = "SELECT name FROM items WHERE topicid = ?"
     cursor.execute(sql, (session['topicid'],))
     previousnames = cursor.fetchall()
     list_items(previousnames)
-    if name not in previousnames and name.replace(' ', '').isalpha() == True and error == "none":
+    if name in previousnames:
+        error = "Item name is already in use"
+    if name.replace(' ', '').isalpha() == False:
+        error = "Item name must only contain letters"
+    if error == "none":
         cursor = get_db().cursor()
         sql = "INSERT INTO items(name, rating, userid, topicid) VALUES(?,?,?,?)"
         cursor.execute(sql, (name, 0, session['userid'], session['topicid']))
         get_db().commit()
         session['error'] = False
         return redirect(url_for('topic', topicid=session['topicid']))
-    session['error'] = "Item name is already in use"
+    else:
+        session['error'] = error
     return redirect(url_for('topic', topicid=session['topicid']))
 
 
@@ -539,4 +577,5 @@ def error_404(error):
 
 # RUN THE APP
 if __name__ == "__main__":
-    app.run(debug=True)
+    port = int(os.environ.get('PORT', 5000))
+    app.run(debug=True, host='0.0.0.0', port=port)

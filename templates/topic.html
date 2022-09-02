@@ -2,7 +2,19 @@
 {% block content %}
 
 <div class="boxless-text topics-title">
-    <h1>{{topics[0][0]}}</h1>
+    <div class="topics-title-editsection">
+        <h1>{{topics[0][0]}}</h1>
+        {%if topics[0][4] == session['userid']:%}
+        <a href="{{url_for('edittopic', topicid=topics[0][5])}}">
+            <svg class="button edit-button inline-edit" viewBox="0 0 100 100">
+                <g transform="scale(1.9)">
+                    <path
+                        d="M9 39h2.2l22.15-22.15-2.2-2.2L9 36.8Zm30.7-24.3-6.4-6.4 2.1-2.1q.85-.85 2.1-.85t2.1.85l2.2 2.2q.85.85.85 2.1t-.85 2.1Zm-2.1 2.1L12.4 42H6v-6.4l25.2-25.2Zm-5.35-1.05-1.1-1.1 2.2 2.2Z" />
+                </g>
+            </svg>
+        </a>
+        {%endif%}
+    </div>
     <p>{{topics[0][1]}}</p>
     <div class="profile">
         <img class="pfp" src="{{url_for('static', filename='/pfps/'+topics[0][3])}}">
@@ -80,7 +92,7 @@
                 </form>
             </td>
             <td>
-                {%if item[3] == userid or topics[0][4] == userid:%}
+                {%if item[3] == session['userid'] or topics[0][4] == session['userid']:%}
                 <a class="button-icon delitem-button" href="{{url_for('userdelete_item', itemid=item[0])}}">
                     <svg viewBox="0 0 100 100">
                         <g transform="scale(2)">
@@ -107,9 +119,9 @@
 </table>
 
 {%if error%}
-    <div class="error">
-        <p>{{error}}</p>
-    </div>
+<div class="error">
+    <p>{{error}}</p>
+</div>
 {%endif%}
 
 
