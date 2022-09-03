@@ -518,6 +518,7 @@ def additem():
         error = "Item name is already in use"
     if name.replace(' ', '').isalpha() == False:
         error = "Item name must only contain letters"
+    error = empty(name, "n item name")
     if error == "none":
         cursor = get_db().cursor()
         sql = "INSERT INTO items(name, rating, userid, topicid) VALUES(?,?,?,?)"

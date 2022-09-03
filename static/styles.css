@@ -19,11 +19,20 @@ body {
     color: black;
 }
 
-a, p, h1, h2, h3, li, b, label, span, title, input, button, ul, li, dl, div {
+a, p, h1, h2, h3, li, b, label, span, title, input, button, ul, li, dl, div, br {
     text-decoration: none;
     font-family: Dosis;
     font-size: 1.3vw;
+    user-select: none;
     color: var(--primary-color);
+}
+
+p, h1, h2, h3, li, b, label, span, title {
+    cursor: default;
+}
+
+input {
+    cursor: auto;
 }
 
 h1 {
@@ -137,6 +146,8 @@ button {
     margin-top: 0;
     color: var(--primary-color);
     padding: 1vw 1.5vw 3.7vw 1.5vw;
+    cursor: default;
+    user-select: none;
     transition: background-color 0.5s, color 0.5s;
 }
 
@@ -149,6 +160,7 @@ button {
     line-height: 0;
     box-shadow: none;
     border-radius: 1000px;
+    cursor: pointer;
     transition: opacity 0.5s;
 }
 
@@ -393,7 +405,9 @@ input[type="file"] {
     text-align: center;
     box-shadow: 0px 0px 1vw #00000050;
     margin: auto;
-
+    cursor: default;
+    user-select:none;
+    transition: opacity 0.5s;
 }
 
 .error {
@@ -405,6 +419,10 @@ input[type="file"] {
     margin-left: 0;
     transform: translate(-50%, -50%);
     -ms-transform: translate(-50%, -50%);
+}
+
+.error p:hover{
+    opacity: 0.1;
 }
 
 @keyframes errorAnim {
@@ -482,6 +500,7 @@ input[type="file"] {
 .button-icon {
     margin: 0.5vw 0.8vw;
     line-height: 3vw;
+    cursor: pointer;
 }
 
 .button-icon svg {
@@ -586,6 +605,7 @@ table {
     border-radius: 2vw;
     border-spacing: 0 0.5vw;
     width: 95vw;
+    user-select: none;
 }
 
 table caption {
@@ -675,6 +695,10 @@ input[type="text"] {
     width: 1.5vw;
     font-size: 2vw;
     color: var(--primary-color);
+    cursor: default;
+}
+
+.rating-input>label {
     cursor: pointer;
 }
 
