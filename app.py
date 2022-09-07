@@ -194,11 +194,13 @@ def delete_item(itemid):
         sql = "SELECT userid, topicid FROM items WHERE id = ?"
         cursor.execute(sql, (itemid, ))
         useriditem = cursor.fetchall()
+        print(useriditem)
         cursor = get_db().cursor()
         sql = "SELECT userid FROM topics WHERE id = ?"
         cursor.execute(sql, (useriditem[0][1], ))
         useridtopic = cursor.fetchall()
-        if useriditem[0][0] != session['userid'] or useridtopic[0][0] != session['userid']:
+        print(useridtopic)
+        if useriditem[0][0] != session['userid'] and useridtopic[0][0] != session['userid']:
             return redirect(url_for('checkcreds'))
     cursor = get_db().cursor()
     sql = "DELETE FROM items WHERE id=?"
@@ -638,7 +640,13 @@ def admin():
 # 404 ERROR HANDLING
 @app.errorhandler(404)
 def error_404(error):
-    return render_template('404.html', error=error), 404
+    return render_template('error.html', error=error), 404
+
+
+# 500 ERROR HANDLING
+@app.errorhandler(500)
+def error_500(error):
+    return render_template('error.html', error=error), 500
 
 
 # ------------------------------------------ RUNNING THE APP  ------------------------------------------ #
@@ -646,4 +654,4 @@ def error_404(error):
 # RUN THE APP
 if __name__ == "__main__":
     port = int(os.environ.get('PORT', 5000))
-    app.run(debug=True, host='0.0.0.0', port=port)
+    app.run(debug=False, host='0.0.0.0', port=port)

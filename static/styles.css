@@ -19,6 +19,10 @@ body {
     color: black;
 }
 
+.errorpage-body a:hover {
+    color: black;
+}
+
 a, p, h1, h2, h3, li, b, label, span, title, input, button, ul, li, dl, div, br {
     text-decoration: none;
     font-family: Dosis;
