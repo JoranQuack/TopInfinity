@@ -5,6 +5,7 @@ from flask import Flask, render_template, g, request, redirect, url_for, session
 from werkzeug.utils import secure_filename
 import sqlite3
 import hashlib
+import random
 import os
 import re
 
@@ -18,7 +19,7 @@ DATABASE = "topinfinity.db"
 # CONFIGURING UPLOADS, SECRET KEY, FLASK APP, AND REGEX
 regex = '(^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$)'
 app = Flask(__name__, template_folder="templates")
-app.secret_key = 'mysecretkey'
+app.secret_key = os.environ.get('SECRET_KEY', 'dev')
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024
 app.config['UPLOAD_EXTENSIONS'] = ['.jpeg', '.jpg', '.png', '.gif', 'JPG']
@@ -136,22 +137,23 @@ def popularity_topics():
 def delete_account(userid):
     if session['adminmode'] != True:
         userid = session['userid']
-    cursor = get_db().cursor()
-    sql = "DELETE FROM users WHERE id=?"
-    cursor.execute(sql, (userid, ))
-    get_db().commit()
-    # delete all ratings and topics that the user has previously made
-    cursor = get_db().cursor()
-    sql = "DELETE FROM user_ratings WHERE userid=?"
-    cursor.execute(sql, (userid, ))
-    get_db().commit()
-    cursor = get_db().cursor()
-    sql = "SELECT id FROM topics WHERE userid = ?"
-    cursor.execute(sql, (userid,))
-    topics = cursor.fetchall()
-    list_items(topics)
-    for topicid in topics:
-        delete_topic(topicid)
+    if userid != 76:
+        cursor = get_db().cursor()
+        sql = "DELETE FROM users WHERE id=?"
+        cursor.execute(sql, (userid, ))
+        get_db().commit()
+        # delete all ratings and topics that the user has previously made
+        cursor = get_db().cursor()
+        sql = "DELETE FROM user_ratings WHERE userid=?"
+        cursor.execute(sql, (userid, ))
+        get_db().commit()
+        cursor = get_db().cursor()
+        sql = "SELECT id FROM topics WHERE userid = ?"
+        cursor.execute(sql, (userid,))
+        topics = cursor.fetchall()
+        list_items(topics)
+        for topicid in topics:
+            delete_topic(topicid)
     # redirect to admin page if adminmode is enabled
     if session['adminmode'] == True:
         return redirect(url_for('admin'))
