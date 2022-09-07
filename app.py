@@ -78,11 +78,64 @@ def empty(input, type):
     return error
 
 
+# AVERAGE ALL ITEMS' RATINGS
+def average_items():
+    # average and then sync the ratings of each item with the user_ratings
+    cursor = get_db().cursor()
+    sql = "SELECT id FROM items"
+    cursor.execute(sql)
+    allitems = cursor.fetchall()
+    list_items(allitems)
+    for number in allitems:
+        cursor = get_db().cursor()
+        sql = "SELECT rating FROM user_ratings WHERE itemid = ?"
+        cursor.execute(sql, (number, ))
+        allratings = cursor.fetchall()
+        list_items(allratings)
+        if len(allratings) > 2:
+            ratingavg = sum(allratings) / len(allratings)
+        else:
+            ratingavg = 0
+        cursor = get_db().cursor()
+        sql = "UPDATE items SET rating = ? WHERE id = ?"
+        cursor.execute(sql, (ratingavg, number))
+        get_db().commit()
+
+
+# UPDATE THE POPULARITY OF EACH TOPIC (based off how many ratings it has overall)
+def popularity_topics():
+    cursor = get_db().cursor()
+    sql = "SELECT id FROM topics"
+    cursor.execute(sql)
+    topicids = cursor.fetchall()
+    list_items(topicids)
+    for topicid in topicids:
+        popularity = 0
+        cursor = get_db().cursor()
+        sql = "SELECT id FROM items WHERE topicid = ?"
+        cursor.execute(sql, (topicid, ))
+        itemids = cursor.fetchall()
+        list_items(itemids)
+        for itemid in itemids:
+            cursor = get_db().cursor()
+            sql = "SELECT id FROM user_ratings WHERE itemid = ?"
+            cursor.execute(sql, (itemid, ))
+            user_ratings = cursor.fetchall()
+            list_items(user_ratings)
+            popularity += len(user_ratings)
+        cursor = get_db().cursor()
+        sql = "UPDATE topics SET popularity = ? WHERE id = ?"
+        cursor.execute(sql, (popularity, topicid))
+        get_db().commit()
+
+
 # --------------------------------------------- APP ROUTING --------------------------------------------- #
 
 # DELETE ANY ACCOUNT
 @app.route("/delete_account/<int:userid>")
 def delete_account(userid):
+    if session['adminmode'] != True:
+        userid = session['userid']
     cursor = get_db().cursor()
     sql = "DELETE FROM users WHERE id=?"
     cursor.execute(sql, (userid, ))
@@ -109,6 +162,13 @@ def delete_account(userid):
 # DELETE ANY TOPIC
 @app.route("/delete_topic/<int:topicid>")
 def delete_topic(topicid):
+    if session['adminmode'] != True:
+        cursor = get_db().cursor()
+        sql = "SELECT userid FROM topics WHERE id = ?"
+        cursor.execute(sql, (topicid,))
+        userid = cursor.fetchall()
+        if userid[0][0] != session['userid']:
+            return redirect(url_for('checkcreds'))
     cursor = get_db().cursor()
     sql = "DELETE FROM topics WHERE id=?"
     cursor.execute(sql, (topicid, ))
@@ -129,6 +189,17 @@ def delete_topic(topicid):
 # DELETE ANY ITEM
 @app.route("/delete_item/<int:itemid>")
 def delete_item(itemid):
+    if session['adminmode'] != True:
+        cursor = get_db().cursor()
+        sql = "SELECT userid, topicid FROM items WHERE id = ?"
+        cursor.execute(sql, (itemid, ))
+        useriditem = cursor.fetchall()
+        cursor = get_db().cursor()
+        sql = "SELECT userid FROM topics WHERE id = ?"
+        cursor.execute(sql, (useriditem[0][1], ))
+        useridtopic = cursor.fetchall()
+        if useriditem[0][0] != session['userid'] or useridtopic[0][0] != session['userid']:
+            return redirect(url_for('checkcreds'))
     cursor = get_db().cursor()
     sql = "DELETE FROM items WHERE id=?"
     cursor.execute(sql, (itemid, ))
@@ -150,29 +221,12 @@ def home():
     session['adminmode'] = False
     # default errors to false
     session['error'] = False
-    # average and then sync the ratings of each item with the user_ratings
-    cursor = get_db().cursor()
-    sql = "SELECT id FROM items"
-    cursor.execute(sql)
-    allitems = cursor.fetchall()
-    list_items(allitems)
-    for number in allitems:
-        cursor = get_db().cursor()
-        sql = "SELECT rating FROM user_ratings WHERE itemid = ?"
-        cursor.execute(sql, (number,))
-        allratings = cursor.fetchall()
-        list_items(allratings)
-        try:
-            ratingavg = sum(allratings) / len(allratings)
-        except:
-            ratingavg = 0
-        cursor = get_db().cursor()
-        sql = "UPDATE items SET rating = ? WHERE id = ?"
-        cursor.execute(sql, (ratingavg, number))
-        get_db().commit()
+    # run the functions that organise the home page items to be in the most relevant order
+    average_items()
+    popularity_topics()
     # select topics and their top 8 items to show on the home screen
     cursor = get_db().cursor()
-    sql = "SELECT topics.title, topics.description, users.username, users.pfp, topics.id FROM topics JOIN users ON topics.userid = users.id;"
+    sql = "SELECT topics.title, topics.description, users.username, users.pfp, topics.id FROM topics JOIN users ON topics.userid = users.id ORDER BY topics.popularity DESC"
     cursor.execute(sql)
     topics = cursor.fetchall()
     for i, topic in enumerate(topics):
@@ -191,7 +245,6 @@ def checkcreds():
     error = "none"
     if 'username' not in session:
         return render_template('welcome.html')
-    print(session['password'])
     cursor = get_db().cursor()
     sql = "SELECT password FROM users"
     cursor.execute(sql)
@@ -304,7 +357,19 @@ def signup():
 # RENDER USER ACCOUNT PAGE
 @app.route("/account")
 def account():
-    return render_template('account.html')
+    # select topics and their top 8 items to show on the home screen
+    cursor = get_db().cursor()
+    sql = "SELECT topics.title, topics.description, users.username, users.pfp, topics.id FROM topics JOIN users ON topics.userid = users.id WHERE topics.userid = ? ORDER BY topics.popularity DESC"
+    cursor.execute(sql, (session['userid'], ))
+    topics = cursor.fetchall()
+    for i, topic in enumerate(topics):
+        cursor = get_db().cursor()
+        sql = "SELECT name FROM items WHERE topicid = ? ORDER BY rating DESC LIMIT 8;"
+        cursor.execute(sql, (topic[4], ))
+        items = cursor.fetchall()
+        topic = topic + (tuple(list_items(items)), )
+        topics[i] = topic
+    return render_template('account.html', topics=topics, enumerate=enumerate)
 
 
 # UPLOAD A NEW PROFILE PICTURE
@@ -409,8 +474,10 @@ def edittopic(topicid):
     cursor = get_db().cursor()
     sql = "SELECT * FROM topics WHERE id = ?"
     cursor.execute(sql, (topicid, ))
-    results = cursor.fetchall()
-    return render_template('edittopic.html', topics=results)
+    topic = cursor.fetchall()
+    if topic[0][1] == session['userid']:
+        return render_template('edittopic.html', topics=topic)
+    return(url_for('checkcreds'))
 
 
 # ENTER EDITED TOPIC DETAILS INTO DATABASE

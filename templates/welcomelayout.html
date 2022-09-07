@@ -1,22 +1,33 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="{{url_for('static', filename='styles.css')}}">
-    <link rel="icon" href="{{url_for('static', filename='websitecomponents/topinfinity.png')}}">
-    <title>Welcome</title>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="{{url_for('static', filename='styles.css')}}">
+  <link rel="icon" href="{{url_for('static', filename='websitecomponents/topinfinity.png')}}">
+  <title>Welcome</title>
 </head>
 
 <style>
-    :root {
-      --primary-color: #5630a8;
-    }
-  </style>
+  :root {
+    --primary-color: #5630a8;
+  }
+</style>
 
 <body>
-    {% block content %}
-    {% endblock %}
+
+  <div class="phone-support">
+    <div>
+      <p>Yo.</p>
+      <p>Unfortunately, this website looks trash on mobile. I am still working on that.</p>
+      <p>Meanwhile, please use a computer :)</p>
+    </div>
+  </div>
+
+  {% block content %}
+  {% endblock %}
 </body>
+
 </html>

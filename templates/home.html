@@ -1,5 +1,6 @@
 {% extends "layout.html" %}
 {% block content %}
+
 <div class="topics-header">
     <h1 class="stranded-h1">Topics</h1>
     <a href="{{url_for('addtopic')}}" class="button addtopic-button">ADD TOPIC</a>
@@ -42,7 +43,6 @@
         {%endif%}
     </div>
 </div>
-
-</div>
 {%endfor%}
+
 {% endblock %}
