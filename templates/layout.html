@@ -16,6 +16,32 @@
   }
 </style>
 
+{%if session['color'] == "fun":%}
+<style>
+  :root {
+    --primary-color: red;
+    animation: fun 5s linear infinite;
+  }
+
+  @keyframes fun {
+    from {--primary-color: rgb(255 0 0);}
+    7% {--primary-color: rgb(206, 89, 0);}
+    15% {--primary-color: rgb(185, 120, 0);}
+    22% {--primary-color: rgb(153, 133, 0);}
+    31% {--primary-color: rgb(140, 140, 0);}
+    38% {--primary-color: rgb(93, 140, 0);}
+    46% {--primary-color: rgb(41, 129, 41);}
+    53% {--primary-color: rgb(0, 140, 91);}
+    61% {--primary-color: rgb(46, 79, 171);}
+    68% {--primary-color: rgb(58, 47, 127);}
+    76% {--primary-color: rgb(96, 30, 144);}
+    31% {--primary-color: rgb(107, 0, 140);}
+    92% {--primary-color: rgb(179, 71, 179);}
+    to {--primary-color: rgb(255 0 0);}
+}
+</style>
+{%endif%}
+
 <body>
 
   <div class="phone-support">
