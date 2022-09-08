@@ -5,7 +5,6 @@ from flask import Flask, render_template, g, request, redirect, url_for, session
 from werkzeug.utils import secure_filename
 import sqlite3
 import hashlib
-import random
 import os
 import re
 
@@ -13,7 +12,7 @@ import re
 # SETTING CONSTANTS FOR UPLOADS AND DATABASE NAME
 UPLOAD_FOLDER = 'static/pfps/'
 ALLOWED_EXTENSIONS = set(['png', 'jpg', 'jpeg', 'gif'])
-DATABASE = "topinfinity.db"
+DATABASE = "./topinfdb/topinfinity.db"
 
 
 # CONFIGURING UPLOADS, SECRET KEY, FLASK APP, AND REGEX
