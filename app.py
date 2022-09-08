@@ -318,11 +318,12 @@ def signup_post():
     cursor.execute(sql)
     emails = cursor.fetchall()
     list_items(emails)
+    print((re.search(regex, email)))
     # error checking
     error = "none"
     if username in usernames:
         error = "Username is already in use, please choose something else"
-    elif (re.search(regex, email)):
+    elif (re.search(regex, email)) == None:
         error = "Email is invalid"
     elif email in emails:
         error = "Email is already in use"
