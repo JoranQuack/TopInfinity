@@ -585,6 +585,7 @@ def additem():
     cursor.execute(sql, (session['topicid'],))
     previousnames = cursor.fetchall()
     list_items(previousnames)
+    error = "none"
     if name in previousnames:
         error = "Item name is already in use"
     elif name.replace(' ', '').isalpha() == False:
@@ -607,6 +608,7 @@ def additem():
 # LET USER CHANGE THE ACCENT COLOUR OF THE WEBSITE
 @app.get('/colorchange/<hex>')
 def colorchange(hex):
+    print(hex)
     if "#" not in hex:
         hex = "fun"
     # change the colour of the session
@@ -660,4 +662,4 @@ def error_500(error):
 # RUN THE APP
 if __name__ == "__main__":
     port = int(os.environ.get('PORT', 5000))
-    app.run(debug=True, host='0.0.0.0', port=port)
+    app.run(debug=False, host='0.0.0.0', port=port)
