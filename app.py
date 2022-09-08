@@ -287,12 +287,10 @@ def signin():
         h = hashlib.md5(password.encode())
         session['password'] = h.hexdigest()
         session['username'] = request.form['username']
-        error2 = empty(password, " password")
-        error1 = empty(session['username'], " username")
-        if error1 != "none":
-            error = error1
-        elif error2 != "none":
-            error = error2
+        if empty(session['username'], " username") != "none":
+            error = empty(session['username'], " username")
+        elif empty(password, " password") != "none":
+            error = empty(password, " password")
         else:
             return redirect(url_for('checkcreds'))
         return render_template('signin.html', error=error)
@@ -303,7 +301,6 @@ def signin():
 @app.post('/signup')
 def signup_post():
     # default set error to none and get the inputed creds from user
-    error = "none"
     username = request.form['username']
     password = request.form['password']
     email = request.form['email']
@@ -311,35 +308,35 @@ def signup_post():
     h = hashlib.md5(password.encode())
     password = h.hexdigest()
     # check for character limit errors and already used usernames
-    error = character_limit(username, 20)
-    error = character_limit(email, 30)
     cursor = get_db().cursor()
     sql = "SELECT username FROM users"
     cursor.execute(sql)
     usernames = cursor.fetchall()
     list_items(usernames)
-    if username in usernames:
-        error = "Username is already in use, please choose something else"
     # use regex to validate email
     cursor = get_db().cursor()
     sql = "SELECT email FROM users"
     cursor.execute(sql)
     emails = cursor.fetchall()
     list_items(emails)
-    if (re.search(regex, email)):
-        if email in emails:
-            error = "Email is already in use"
-    else:
+    # error checking
+    error = "none"
+    if username in usernames:
+        error = "Username is already in use, please choose something else"
+    elif (re.search(regex, email)):
         error = "Email is invalid"
-    error2 = empty(email, "n email")
-    error3 = empty(password, " password")
-    error1 = empty(username, " username")
-    if error1 != "none":
-        error = error1
-    elif error2 != "none":
-        error = error2
-    elif error3 != "none":
-        error = error3
+    elif email in emails:
+        error = "Email is already in use"
+    elif character_limit(username, 20) != "none":
+        error = character_limit(username, 20)
+    elif character_limit(email, 30) != "none":
+        error = character_limit(email, 30)
+    elif empty(email, "n email") != "none":
+        error = empty(email, "n email")
+    elif empty(password, " password") != "none":
+        error = empty(password, " password")
+    elif empty(username, " username") != "none":
+        error = empty(username, " username")
     # return to signup page with error if there are any
     if error != "none":
         return render_template('signup.html', error=error, username=username, email=email, password=password)
@@ -444,15 +441,17 @@ def addtopic():
     if request.method == 'POST':
         title = request.form['title'].capitalize()
         description = request.form['description']
-        error = character_limit(title, 30)
-        error = character_limit(description, 130)
-        error = letter_check(title)
-        error1 = empty(title, " title")
-        error2 = empty(description, " description")
-        if error1 != "none":
-            error = error1
-        elif error2 != "none":
-            error = error2
+        error = "none"
+        if character_limit(title, 30) != "none":
+            error = character_limit(title, 30)
+        elif character_limit(description, 100) != "none":
+            error = character_limit(description, 100)
+        elif letter_check(title) != "none":
+            error = letter_check(title)
+        elif empty(title, " title") != "none":
+            error = empty(title, " title")
+        elif empty(description, " description") != "none":
+            error = empty(description, " description")
         if error == "none":
             cursor = get_db().cursor()
             sql = "INSERT INTO topics(userid, title, description) VALUES(?,?,?)"
@@ -490,15 +489,17 @@ def edittopic_post():
     # error check and format everything
     title = request.form['title'].capitalize()
     description = request.form['description']
-    error = character_limit(title, 30)
-    error = character_limit(description, 130)
-    error = letter_check(title)
-    error1 = empty(title, " title")
-    error2 = empty(description, " description")
-    if error1 != "none":
-        error = error1
-    elif error2 != "none":
-        error = error2
+    error = "none"
+    if character_limit(title, 30) != "none":
+        error = character_limit(title, 30)
+    elif character_limit(description, 100) != "none":
+        error = character_limit(description, 100)
+    elif letter_check(title) != "none":
+        error = letter_check(title)
+    elif empty(title, " title") != "none":
+        error = empty(title, " title")
+    elif empty(description, " description") != "none":
+        error = empty(description, " description")
     # update db if no error
     if error == "none":
         cursor = get_db().cursor()
@@ -578,7 +579,6 @@ def additem():
     # format item name to look nice
     name = request.form['itemname'].capitalize()
     name = name.strip()
-    error = character_limit(name, 30)
     # make sure it's not already in the database
     cursor = get_db().cursor()
     sql = "SELECT name FROM items WHERE topicid = ?"
@@ -587,9 +587,12 @@ def additem():
     list_items(previousnames)
     if name in previousnames:
         error = "Item name is already in use"
-    if name.replace(' ', '').isalpha() == False:
+    elif name.replace(' ', '').isalpha() == False:
         error = "Item name must only contain letters"
-    error = empty(name, "n item name")
+    elif character_limit(name, 30) != "none":
+        error = character_limit(name, 30)
+    elif empty(name, "n item name") != "none":
+        error = empty(name, "n item name")
     if error == "none":
         cursor = get_db().cursor()
         sql = "INSERT INTO items(name, rating, userid, topicid) VALUES(?,?,?,?)"
@@ -597,8 +600,7 @@ def additem():
         get_db().commit()
         session['error'] = False
         return redirect(url_for('topic', topicid=session['topicid']))
-    else:
-        session['error'] = error
+    session['error'] = error
     return redirect(url_for('topic', topicid=session['topicid']))
 
 

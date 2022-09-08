@@ -550,6 +550,8 @@ input[type="file"] {
     margin: 0;
     margin-top: 0vw;
     margin-right: 0.5vw;
+    width: 38vw;
+    word-wrap: break-word;
 }
 
 .topic-items {
