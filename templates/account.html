@@ -1,6 +1,13 @@
 {% extends "layout.html" %}
 {% block content %}
 
+<div class="mobile-accbox accbox">
+	<img src="{{url_for('static', filename='pfps/'+session['pfp'])}}" class="pfp"></img> <br>
+	<h1>Hi there, {{session['username']}}</h1>
+	<p>Email: {{session['email']}}</p>
+	<a class="button" href="{{url_for('logout')}}">Log Out</a>
+</div>
+
 <div class="account-boxes">
 	<div class="left-accbox accbox">
 		<h1>Upload a New Profile Picture</h1>
@@ -54,15 +61,11 @@
 		<div class="topic-info">
 			<h2 class="topic-title">{{topic[0]}}</h2>
 			<p class="topic-description">{{topic[1]}}</p>
-			<div class="profile">
-				<img class="pfp" src="{{url_for('static', filename='pfps/'+topic[3])}}">
-				{{topic[2]}}
-			</div>
 		</div>
 		<div class="topic-interaction">
 			<a class="button rate-button" href="{{url_for('topic', topicid=topic[4])}}">GO RATE</a> <br>
 			<a href="{{url_for('edittopic', topicid=topic[4])}}">
-				<svg class="button edit-button" viewBox="0 0 100 100">
+				<svg class="button edit-button home-edit" viewBox="0 0 100 100">
 					<g transform="scale(1.9)">
 						<path
 							d="M9 39h2.2l22.15-22.15-2.2-2.2L9 36.8Zm30.7-24.3-6.4-6.4 2.1-2.1q.85-.85 2.1-.85t2.1.85l2.2 2.2q.85.85.85 2.1t-.85 2.1Zm-2.1 2.1L12.4 42H6v-6.4l25.2-25.2Zm-5.35-1.05-1.1-1.1 2.2 2.2Z" />

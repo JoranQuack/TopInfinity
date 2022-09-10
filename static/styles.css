@@ -271,7 +271,6 @@ form input {
     display: inline-block;
     padding: 0 1.5vw;
     height: 3vw;
-    line-height: 3vw;
     border-radius: 1.5vw;
     font-family: Dosis;
     font-size: 1.3vw;
@@ -279,7 +278,12 @@ form input {
     color: var(--primary-color);
     background-color: #ffffff;
     box-shadow: 0px 0px 1vw #00000050;
+}
 
+.profile p {
+    color: var(--primary-color);
+    display: inline-block;
+    margin-top: 0.7vw;
 }
 
 .profile img {
@@ -326,7 +330,7 @@ form input {
     padding-top: 2vw;
 }
 
-.centre-accbox img {
+.accbox img {
     margin-top: 0 auto;
     width: 10vw;
     height: 10vw;
@@ -350,6 +354,10 @@ input[type="file"] {
 
 .color-accbox {
     margin-bottom: 2.2vw;
+}
+
+.mobile-accbox {
+    display: none;
 }
 
 .color-spots {
@@ -662,6 +670,11 @@ input[name="itemname"] {
     line-height: 0;
 }
 
+.input-col a {
+    font-size: 1vw;
+    padding: 0.4vw 0.5vw;
+}
+
 input,
 input::placeholder,
 input[type="text"] {
@@ -724,11 +737,11 @@ input[type="text"] {
 
 @media (max-width: 770px) {
 
-    .phone-support {
+    /* .phone-support {
         display: inline;
         width: 100%;
         height: 100%;
-        position: absolute;
+        position: fixed;
         transform-origin: top;
         background-color: var(--primary-color);
         top: 0;
@@ -742,18 +755,26 @@ input[type="text"] {
         top: 50%;
         left: 50%;
         transform: translate(-50%, -50%);
+    } */
+
+    body {
+        padding: 4vw;
     }
 
     h1 {
+        font-size: 6vw;
+    }
+
+    h2, h3 {
         font-size: 5vw;
     }
 
     p {
-        font-size: 3vw;
+        font-size: 4vw;
     }
 
     .bar {
-        height: 20vw;
+        height: 15vw;
     }
 
     .bar p {
@@ -762,11 +783,266 @@ input[type="text"] {
 
     .home-button,
     .bar-pfp {
-        height: 18.75vw;
-        width: 18.75vw;
+        height: 13.75vw;
+        width: 13.75vw;
         margin-left: 1vw;
         box-shadow: none;
     }
 
+    .button {
+        font-size: 3.5vw;
+        width: fit-content;
+        height: fit-content;
+        border-radius: 1000px;
+    }
+
+    .addtopic-button {
+        padding: 2.2vw;
+        margin-top: 2vw;
+    }
+
+    .topic-box {
+        display: inline-block;
+        width: 89vw;
+        border-radius: 6vw;
+        margin-bottom: 3vw;
+    }
+
+    .topics-header {
+        margin: 2vw 0 3vw 0;
+    }
+
+    .topic-left {
+        width: 85vw;
+    }
+
+    .topic-info {
+        width: 50vw;
+        padding: 2vw;
+    }
+
+    .topic-interaction {
+        width: 35vw;
+    }
+
+    .topic-items {
+        padding: 0 2vw 4vw 2vw;
+        width: 85vw;
+    }
+
+    .topic-items h3 {
+        margin-bottom: 1.5vw;
+    }
+
+    .topic-items span{
+        font-size: 3vw;
+        padding: 0.5vw 1.5vw;
+        margin: 0.7vw 0.5vw;
+    }
+
+    .rate-button {
+        margin: 3vw 0 0 15vw;
+        position: absolute;
+        padding: 2vw;
+    }
+
+    .topic-description {
+        margin-bottom: 2vw;
+    }
+
+    .profile {
+        height: 5vw;
+        border-radius: 1000px;
+    }
+
+    .profile p {
+        font-size: 3.5vw;
+        margin-top: 0.2vw;
+    }
+
+    .profile img {
+        height: 5vw;
+        width: 5vw;
+    }
+
+    .account-boxes {
+        display: block;
+    }
+
+    .accbox {
+        border-radius: 6vw;
+        margin-top: 3vw;
+        width: 82vw;
+        padding: 5vw;
+    }
+
+    .right-accbox {
+        display: inline-block;
+    }
+
+    .centre-accbox {
+        display: none;
+    }
+
+    .mobile-accbox {
+        display: inline-block;
+    }
+
+    .mobile-accbox p {
+        margin-bottom: 3vw;
+    }   
+
+    .left-accbox h1 {
+        margin-bottom: 0;
+    }
+    
+    .left-accbox form {
+        margin-top: 5vw;
+    }
+
+    .left-accbox label {
+        font-size: 3.5vw;
+        padding: 1vw 1.5vw;
+        border: none; 
+        box-shadow: 0px 0px 1vw #00000050;
+        margin: 0;
+    }
+
+    .color-spots a {
+        width: 7vw;
+        height: 7vw;
+    }
+
+    .deleteacc-accbox h1 {
+        margin-bottom: 5vw;
+    }
+    
+    form label {
+        font-size: 4vw;
+    }
+
+    .form-button {
+        padding: 1.5vw 2vw;
+        margin-top: 2vw;
+    }
+
+    input, input::placeholder, input[type="text"] {
+        font-size: 3.5vw;
+        padding: 2vw 0;
+        width: 40vw;
+        margin: 1.5vw;
+    }
+
+    .edit-button {
+        height: 4.5vw;
+        width: 4.5vw;
+    }
+
+    .inline-edit {
+        margin-top: 2vw;
+    }
+
+    table {
+        width: 89vw;
+        border-radius: 6vw;
+    }
+
+    .input-col a {
+        font-size: 3.5vw;
+        padding: 0.9vw 2vw;
+    }
+
+    .delitem-button svg {
+        height: 5vw;
+        width: 5vw;
+    }
+
+    .rating>label {
+        width: 4vw;
+        font-size: 5vw;
+    }
+
+    .home-edit {
+        margin-top: 10vw;
+        width: 6vw;
+        height: 6vw;
+    }
+
+    .deltopic-button {
+        padding: 1.5vw 2vw;
+        display: inline-block;
+        margin: 3vw 0 0 35.5vw;
+    }
+
+    .box {
+        border-radius: 6vw;
+        padding: 2vw 5vw 6vw 5vw;
+    }
+
+    .box a {
+        margin: 1vw;
+    }
+
+    .login {
+        display: inline-block;
+    }
+
+    .login-area {
+        height: 30vw;
+    }
+
+    .main-login {
+        height: 100vw;
+        width: 90vw;
+    }
+
+    .password-input {
+        font-size: 3.5vw;
+        padding: 2vw 0;
+        width: 40vw;
+        margin: 1.5vw;
+    }
+
+    .password-input {
+        margin-bottom: 4vw;
+    }
+
+    .side-login {
+        margin-top: 4vw;
+        width: 90vw;
+        height: 34vw;
+    }
+
+    .mobile-topsignup {
+        margin-top: 0;
+        margin-bottom: 4vw;
+    }
+
+    .login button {
+        padding: 3vw;
+    }
+
+    .error {
+        padding: 2vw;
+    }
+
+    .topics-title {
+        margin-top: 2vw;
+    }
+
+    .topics-title p {
+        word-wrap: break-word;
+    }
+
+    .topic-items p {
+        margin-bottom: 3vw;
+    }
+
+    .topic-items a {
+        font-size: 5vw;
+        border-radius: 10000px;
+        padding: 0 2.5vw 1vw 2.5vw;
+        margin-bottom: 3vw;
+    }
 
 }

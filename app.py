@@ -214,6 +214,7 @@ def delete_item(itemid):
     get_db().commit()
     if session['adminmode'] == True:
         return redirect(url_for('admin'))
+    session['error'] = "none"
     return redirect(url_for('topic', topicid=session['topicid']))
 
 
@@ -547,7 +548,8 @@ def topic(topicid):
             item = item + (checked_numbers[0], )
         items[i] = item
     # manage errors
-    return render_template('topic.html', topics=topics, items=items, enumerate=enumerate, error=session['error'])
+    error = session['error']
+    return render_template('topic.html', topics=topics, items=items, enumerate=enumerate, error=error)
 
 
 # SUBMIT A RATING FOR A SPECIFIC ITEM
@@ -570,6 +572,7 @@ def rate(itemid):
         sql = "UPDATE user_ratings SET rating = ? WHERE userid = ? AND itemid = ?"
         cursor.execute(sql, (rating, session['userid'], itemid))
         get_db().commit()
+    session['error'] = "none"
     return redirect(url_for('topic', topicid=session['topicid']))
 
 

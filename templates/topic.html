@@ -17,8 +17,8 @@
     </div>
     <p>{{topics[0][1]}}</p>
     <div class="profile">
-        <img class="pfp" src="{{url_for('static', filename='/pfps/'+topics[0][3])}}">
-        {{topics[0][2]}}
+        <img class="pfp" src="{{url_for('static', filename='pfps/'+topics[0][3])}}">
+        <p>{{topics[0][2]}}</p>
     </div>
 </div>
 
@@ -111,14 +111,14 @@
             <td colspan="5" class="input-col">
                 <form action="/additem" method="post">
                     <input type="text" name="itemname" placeholder="Add a new item!" type="submit">
-                    <button class="button" type="submit">Add Item</button>
+                    <a class="button" type="submit">Add Item</a>
                 </form>
             </td>
         </tr>
     </tbody>
 </table>
 
-{%if error%}
+{%if error and error != "none" and error != False%}
 <div class="error">
     <p>{{error}}</p>
 </div>
