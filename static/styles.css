@@ -841,7 +841,7 @@ input[type="text"] {
     }
 
     .rate-button {
-        margin: 3vw 0 0 15vw;
+        margin: 3vw 0 0 18vw;
         position: absolute;
         padding: 2vw;
     }
@@ -989,6 +989,7 @@ input[type="text"] {
 
     .login-area {
         height: 30vw;
+        border-radius: 6vw;
     }
 
     .main-login {
