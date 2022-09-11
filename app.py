@@ -591,8 +591,6 @@ def additem():
     error = "none"
     if name in previousnames:
         error = "Item name is already in use"
-    elif name.replace(' ', '').isalpha() == False:
-        error = "Item name must only contain letters"
     elif character_limit(name, 30) != "none":
         error = character_limit(name, 30)
     elif empty(name, "n item name") != "none":
