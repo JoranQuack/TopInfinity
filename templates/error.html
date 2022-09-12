@@ -9,8 +9,13 @@
     <link rel="icon" href="{{url_for('static', filename='websitecomponents/error.png')}}">
 </head>
 <body class="errorpage-body">
-    <h1>You've done goofed :(</h1>
-    <p><b>ERROR: </b>{{error}}</p>
+    <h1>{{title}}</h1>
+    <p>ERROR: {{error}}</p>
+
+    {%if title == "Looks like you aren't signed in!"%}
+    <a class="button" href="{{url_for('signin')}}">Sign in</a>
+    {%else%}
     <a class="button" href="{{url_for('checkcreds')}}">Go home</a>
+    {%endif%}
 </body>
 </html>

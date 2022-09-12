@@ -275,6 +275,8 @@ def checkcreds():
     session['color'] = "#5630a8"
     if usercreds[0][5]:
         session['color'] = usercreds[0][5]
+    if error == "Please sign in first": 
+        return redirect(request.referrer)
     return redirect(url_for('home'))
 
 
@@ -649,13 +651,18 @@ def admin():
 # 404 ERROR HANDLING
 @app.errorhandler(404)
 def error_404(error):
-    return render_template('error.html', error=error), 404
+    title = "Oops! That page doesn't exist!"
+    return render_template('error.html', title=title, error=error), 404
 
 
 # 500 ERROR HANDLING
 @app.errorhandler(500)
 def error_500(error):
-    return render_template('error.html', error=error), 500
+    title = ":( there has been an error"
+    if 'username' not in session:
+        error = "Please sign in first"
+        return render_template('signin.html', error=error)
+    return render_template('error.html', title=title, error=error), 500
 
 
 # ------------------------------------------ RUNNING THE APP  ------------------------------------------ #
