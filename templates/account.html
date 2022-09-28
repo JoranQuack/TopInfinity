@@ -9,23 +9,18 @@
 </div>
 
 <div class="account-boxes">
-	<div class="left-accbox accbox">
-		<h1>Upload a New Profile Picture</h1>
-		<form method="post" action="/pfp" enctype="multipart/form-data">
-			<label class="button">
-				<input type="file" name="file" onchange="form.submit()" accept=".png, .jpg, .jpeg, .gif, .JPG" required>
-				Upload a File
-			</label>
-		</form>
-		<p class="important">{{error}}</p>
-	</div>
-	<div class="centre-accbox accbox">
-		<img src="{{url_for('static', filename='pfps/'+session['pfp'])}}" class="pfp"></img> <br>
-		<h1>Hi there, {{session['username']}}</h1>
-		<p>Email: {{session['email']}}</p>
-		<a class="button" href="{{url_for('logout')}}">Log Out</a>
-	</div>
-	<div class="right-accbox">
+
+	<div class="left-accbox">
+		<div class="pfp-accbox accbox">
+			<h1>Upload a New Profile Picture</h1>
+			<form method="post" action="/pfp" enctype="multipart/form-data">
+				<label class="button">
+					<input type="file" name="file" onchange="form.submit()" accept=".png, .jpg, .jpeg, .gif, .JPG">
+					Upload a File
+				</label>
+			</form>
+		</div>
+
 		<div class="color-accbox accbox">
 			<h1>Accent Colour</h1>
 			<div class="color-spots">
@@ -37,18 +32,47 @@
 				<a style="background-color: #078dbd" href="{{url_for('colorchange', hex='#078dbd')}}"></a>
 			</div>
 		</div>
+	</div>
+
+	<div class="centre-accbox accbox">
+		<div class="profile-info">
+			<img src="{{url_for('static', filename='pfps/'+session['pfp'])}}" class="pfp"></img> <br>
+			<h1>Hi there, {{session['username']}}</h1>
+			<p>Email: {{session['email']}}</p>
+			<a class="button" href="{{url_for('logout')}}">Log Out</a>
+		</div>
+	</div>
+
+	<div class="right-accbox">
+		<div class="pwdchange-accbox accbox">
+			<h1>Update Password</h1>
+			<form class="pwdupdate-form" action="/pwdupdate" method="post">
+
+				<label for="password">Password</label> <br>
+				<input class="password-input" type="password" placeholder="Enter Password" name="password"> <br>
+
+				<label for="password">Confirm Password</label> <br>
+				<input class="password-input" type="password" placeholder="Confirm Password" name="confpassword"> <br>
+
+				<button type="submit" class="form-button button" onClick="confirm('Are you sure you want to change your password?')">Update Password</button>
+
+			</form>
+		</div>
+
 		<div class="deleteacc-accbox accbox">
 			<h1>Delete your Account</h1>
 			<a href="{{url_for('userdelete_account', confirmed='False')}}" class="button important">Delete Account</a>
 		</div>
 	</div>
+
 </div>
 <br>
+
 <div class="topics-header">
 	<h1 class="stranded-h1">Your Topics</h1>
 </div>
 
-{%if topics |length == 0:%}
+{%if topics |length == 0%}
 <div class="make-topic-box">
 	<p>You haven't made any topics.</p>
 	<a href="{{url_for('addtopic')}}" class="button">ADD TOPIC</a>
@@ -87,5 +111,17 @@
 	</div>
 </div>
 {%endfor%}
+
+{%if error and error != "none" and error != False%}
+<div class="error">
+    <p>{{error}}</p>
+</div>
+{%endif%}
+
+{%if message and message != "none" and message != False%}
+<div class="error message">
+    <p>{{message}}</p>
+</div>
+{%endif%}
 
 {% endblock %}

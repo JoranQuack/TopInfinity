@@ -1,12 +1,10 @@
 # --------------------------------------------- SETTING UP --------------------------------------------- #
 
 # IMPORTS
+from pydoc import render_doc
 from flask import Flask, render_template, g, request, redirect, url_for, session, flash
 from werkzeug.utils import secure_filename
-import sqlite3
-import hashlib
-import os
-import re
+import sqlite3, hashlib, uuid, os, re
 
 
 # SETTING CONSTANTS FOR UPLOADS AND DATABASE NAME
@@ -15,13 +13,19 @@ ALLOWED_EXTENSIONS = set(['png', 'jpg', 'jpeg', 'gif'])
 DATABASE = "./topinfdb/topinfinity.db"
 
 
-# CONFIGURING UPLOADS, SECRET KEY, FLASK APP, AND REGEX
+# CONFIGURING UPLOADS, FLASK APP, AND REGEX
 regex = '(^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$)'
 app = Flask(__name__, template_folder="templates")
-app.secret_key = os.environ.get('SECRET_KEY', 'dev')
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024
 app.config['UPLOAD_EXTENSIONS'] = ['.jpeg', '.jpg', '.png', '.gif', 'JPG']
+
+
+# GET KEY FROM HIDDEN FILE (NOT ON GITHUB)
+with open('key.txt') as f:
+    key = f.readlines()[0]
+salt = key
+app.secret_key = key
 
 
 # ------------------------------------------- BASIC FUNCTIONS ------------------------------------------- #
@@ -129,6 +133,25 @@ def popularity_topics():
         get_db().commit()
 
 
+# SALT OLD UNSALTED PASSWORDS IF NOT SALTED
+def hash_manager(password, username):
+    salted_password = password + salt
+    salted_password = hashlib.md5(salted_password.encode()).hexdigest()
+    unsalted_password = hashlib.md5(password.encode()).hexdigest()
+    cursor = get_db().cursor()
+    sql = "SELECT password FROM users WHERE username = ?"
+    cursor.execute(sql, (username, ))
+    passwords = cursor.fetchall()
+    list_items(passwords)
+    if unsalted_password in passwords and salted_password not in passwords:
+        cursor = get_db().cursor()
+        sql = "UPDATE users SET password = ? WHERE username = ?"
+        cursor.execute(sql, (salted_password, username))
+        get_db().commit()
+    password = salted_password
+    return password
+
+
 # --------------------------------------------- APP ROUTING --------------------------------------------- #
 
 # DELETE ANY ACCOUNT
@@ -225,6 +248,8 @@ def home():
     session['adminmode'] = False
     # default errors to false
     session['error'] = False
+    # default messages to false
+    session['message'] = False
     # run the functions that organise the home page items to be in the most relevant order
     average_items()
     popularity_topics()
@@ -250,8 +275,8 @@ def checkcreds():
     if 'username' not in session:
         return render_template('welcome.html')
     cursor = get_db().cursor()
-    sql = "SELECT password FROM users"
-    cursor.execute(sql)
+    sql = "SELECT password FROM users WHERE username = ?"
+    cursor.execute(sql, (session['username'], ))
     passwords = cursor.fetchall()
     list_items(passwords)
     if session['password'] not in passwords:
@@ -285,10 +310,10 @@ def checkcreds():
 def signin():
     # get the form details if a form was submitted
     if request.method == 'POST':
-        password = request.form['password']
-        h = hashlib.md5(password.encode())
-        session['password'] = h.hexdigest()
         session['username'] = request.form['username']
+        password = request.form['password']
+        password = hash_manager(password, session['username'])
+        session['password'] = password
         if empty(session['username'], " username") != "none":
             error = empty(session['username'], " username")
         elif empty(password, " password") != "none":
@@ -305,10 +330,8 @@ def signup_post():
     # default set error to none and get the inputed creds from user
     username = request.form['username']
     password = request.form['password']
+    confpassword = request.form["confpassword"]
     email = request.form['email']
-    # password hashing
-    h = hashlib.md5(password.encode())
-    password = h.hexdigest()
     # check for character limit errors and already used usernames
     cursor = get_db().cursor()
     sql = "SELECT username FROM users"
@@ -340,16 +363,21 @@ def signup_post():
         error = empty(password, " password")
     elif empty(username, " username") != "none":
         error = empty(username, " username")
+    elif password != confpassword:
+        error = "Passwords don't match"
     # return to signup page with error if there are any
     if error != "none":
         return render_template('signup.html', error=error, username=username, email=email, password=password)
+    # password hashing
+    h = password + salt
+    password = hashlib.md5(h.encode()).hexdigest()
     # insert all credentials in the database and tell user to sign in again
     cursor = get_db().cursor()
     sql = "INSERT INTO users(username, password, pfp, email, color) VALUES(?,?,?,?,?)"
     cursor.execute(sql, (username, password, "default.png", email, "#5630a8"))
     get_db().commit()
-    error = "Account has been created, please sign in"
-    return render_template('signin.html', error=error)
+    message = "Account has been created, please sign in"
+    return render_template('signin.html', message=message)
 
 
 # RENDER THE SIGNUP PAGE
@@ -373,7 +401,11 @@ def account():
         items = cursor.fetchall()
         topic = topic + (tuple(list_items(items)), )
         topics[i] = topic
-    return render_template('account.html', topics=topics, enumerate=enumerate)
+    message = session['message']
+    session['message'] = "none"
+    error = session['error']
+    session['error'] = "none"
+    return render_template('account.html', topics=topics, enumerate=enumerate, message=message, error=error)
 
 
 # UPLOAD A NEW PROFILE PICTURE
@@ -396,7 +428,35 @@ def upload_image():
     sql = "UPDATE users SET pfp = ? WHERE id = ?"
     cursor.execute(sql, (session['pfp'], session['userid'], ))
     get_db().commit()
-    return render_template('account.html')
+    session['message'] = "Profile picture updated"
+    return redirect(url_for('account'))
+
+
+# CHANGE PASSWORDS
+@app.post('/pwdupdate')
+def pwdupdate():
+    password = request.form['password']
+    confpassword = request.form["confpassword"]
+    # error checking
+    error = "none"
+    if empty(password, " password") != "none":
+        error = empty(password, " password")
+    elif password != confpassword:
+        error = "Passwords don't match"
+    if error == "none":
+        # password hashing
+        h = password + salt
+        password = hashlib.md5(h.encode()).hexdigest()
+        # put in db
+        cursor = get_db().cursor()
+        sql = "UPDATE users SET password = ? WHERE id = ?"
+        cursor.execute(sql, (password, session['userid'], ))
+        get_db().commit()
+        session['password'] = password
+        session['message'] = "Password was changed"
+    else:
+        session['error'] = error
+    return redirect(url_for('account'))
 
 
 # LOGOUT AND CLEAR SESSION
@@ -670,4 +730,4 @@ def error_500(error):
 # RUN THE APP
 if __name__ == "__main__":
     port = int(os.environ.get('PORT', 5000))
-    app.run(debug=False, host='0.0.0.0', port=port)
+    app.run(debug=True, host='0.0.0.0', port=port)

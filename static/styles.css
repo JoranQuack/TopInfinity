@@ -315,7 +315,7 @@ form input {
 
 .accbox {
     width: 31vw;
-    padding: 0.5vw 0 2vw 0;
+    padding: 0.5vw 0 0.5vw 0;
     background-color: #ffffff;
     border-radius: 2vw;
     text-align: center;
@@ -330,6 +330,13 @@ form input {
     padding-top: 2vw;
 }
 
+.profile-info {
+    position: relative;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
 .accbox img {
     margin-top: 0 auto;
     width: 10vw;
@@ -337,7 +344,8 @@ form input {
 }
 
 .left-accbox form {
-    margin-top: 10.5vw;
+    margin-top: 5.5vw;
+    margin-bottom: 5.2vw;
 }
 
 input[type="file"] {
@@ -346,14 +354,14 @@ input[type="file"] {
 
 .left-accbox label {
     font-size: 1.5vw;
-    padding: 8vw 10vw;
+    padding: 4.5vw 10vw;
     box-shadow: none;
     border: 0.3vw dashed var(--primary-color);
     cursor: pointer;
 }
 
 .color-accbox {
-    margin-bottom: 2.2vw;
+    margin-top: 2.2vw;
 }
 
 .mobile-accbox {
@@ -381,6 +389,24 @@ input[type="file"] {
     opacity: 50%;
 }
 
+.deleteacc-accbox {
+    margin-top: 2.2vw;
+}
+
+.right-accbox div {
+    padding-bottom: 1.39vw;
+}
+
+.pwdupdate-form button {
+    font-size: 1.2vw;
+    padding: 0 1vw;
+}
+
+.pwdupdate-form label {
+    color: var(--primary-color);
+}
+
+
 .box {
     background-color: white;
     border-radius: 2vw;
@@ -403,13 +429,6 @@ input[type="file"] {
 
 .important {
     color: red;
-}
-
-.flashes {
-    background-color: red;
-    color: white;
-    border-radius: 1000px;
-    text-decoration: none;
 }
 
 .error p {
@@ -439,6 +458,10 @@ input[type="file"] {
 
 .error p:hover {
     opacity: 0.1;
+}
+
+.error.message p {
+    background-color: green;
 }
 
 @keyframes errorAnim {
@@ -897,7 +920,7 @@ input[type="text"] {
     }
     
     .left-accbox form {
-        margin-top: 5vw;
+        margin-top: 2vw;
     }
 
     .left-accbox label {

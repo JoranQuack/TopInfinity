@@ -7,6 +7,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="{{url_for('static', filename='styles.css')}}">
   <link rel="icon" href="{{url_for('static', filename='websitecomponents/topinfinity.png')}}">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/dropzone/4.3.0/dropzone.js"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/dropzone/4.3.0/dropzone.css" />
   <title>Top Infinity</title>
 </head>
 
@@ -82,17 +84,8 @@
 {%endif%}
 
 <body>
-
-  <div class="phone-support">
-    <div>
-      <p>Yo!</p>
-      <p>Unfortunately, this website looks trash on mobile. I am still working on that.</p>
-      <p>Meanwhile, please use a computer :)</p>
-    </div>
-  </div>
-
   <div class="bar">
-    <a href="{{url_for('home')}}">
+    <a href="{{url_for('checkcreds')}}">
       <svg class="home-button" viewBox="0 0 100 100">
         <g transform="scale(2)">
           <path
