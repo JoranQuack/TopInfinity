@@ -760,26 +760,6 @@ input[type="text"] {
 
 @media (max-width: 770px) {
 
-    /* .phone-support {
-        display: inline;
-        width: 100%;
-        height: 100%;
-        position: fixed;
-        transform-origin: top;
-        background-color: var(--primary-color);
-        top: 0;
-        left: 0;
-        z-index: 99 !important;
-    }
-    
-    .phone-support div {
-        text-align: center;
-        position: relative;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-    } */
-
     body {
         padding: 4vw;
     }

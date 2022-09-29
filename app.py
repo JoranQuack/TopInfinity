@@ -3,11 +3,12 @@
 # IMPORTS
 from flask import Flask, render_template, g, request, redirect, url_for, session, flash
 from werkzeug.utils import secure_filename
+from email.message import EmailMessage
 from flask_mail import Message, Mail
 from dotenv import load_dotenv
 from pathlib import Path
 
-import sqlite3, hashlib, os, re
+import sqlite3, hashlib, os, re, smtplib, ssl
 
 
 # SETTING CONSTANTS FOR UPLOADS AND DATABASE NAME
@@ -23,14 +24,19 @@ mail = Mail(app)
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024
 app.config['UPLOAD_EXTENSIONS'] = ['.jpeg', '.jpg', '.png', '.gif', 'JPG']
+allowed_ratings = ["1", "2", "3", "4", "5"]
 
 
-# GET KEY FROM HIDDEN FILE (NOT ON GITHUB)
+# GET KEYS FROM HIDDEN .ENV FILE (NOT ON GITHUB)
 dotenv_path = Path('secrets.env')
 load_dotenv(dotenv_path=dotenv_path)
 salt = os.getenv('SALT')
 app.secret_key = os.getenv('SECRETKEY')
+#set up emailing system
+email_sender = 'noreplytopinfinity@gmail.com'
 email_password = os.getenv('PASSWORD')
+
+
 
 # ------------------------------------------- BASIC FUNCTIONS ------------------------------------------- #
 
@@ -156,6 +162,20 @@ def hash_manager(password, username):
     return password
 
 
+# SEND EMAILS
+def email(email_receiver, username, confirmkey):
+    em = EmailMessage()
+    em['From'] = email_sender
+    em['To'] = email_receiver
+    em['Subject'] = f"{username}, please verify your new Top Infinity account."
+    em.set_content("ooga booga joran is cool! https://topinfinity.blackdahu.com/confirm/")
+    context = ssl.create_default_context()
+    with smtplib.SMTP_SSL('smtp.gmail.com', 465, context=context) as smtp:
+        smtp.login(email_sender, email_password)
+        smtp.sendmail(email_sender, email_receiver, em.as_string())
+
+
+
 # --------------------------------------------- APP ROUTING --------------------------------------------- #
 
 # DELETE ANY ACCOUNT
@@ -246,6 +266,7 @@ def delete_item(itemid):
 # HOME ROUTE
 @app.route("/home")
 def home():
+    # email(session['email'], session['username'], session['userid'])
     # default to disabling adminmode
     session['adminmode'] = False
     # default errors to false
@@ -556,7 +577,8 @@ def edittopic(topicid):
     topic = cursor.fetchall()
     if topic[0][1] == session['userid']:
         return render_template('edittopic.html', topics=topic)
-    return(url_for('checkcreds'))
+    else:
+        return redirect(url_for('checkcreds'))
 
 
 # ENTER EDITED TOPIC DETAILS INTO DATABASE
@@ -632,8 +654,7 @@ def topic(topicid):
 def rate(itemid):
     formrating = f"rating.{itemid}"
     rating = request.form[formrating]
-    if rating != 1 and rating != 2 and rating != 3 and rating != 4 and rating != 5:
-        session['error'] = "Go away Sam"
+    if rating not in allowed_ratings:
         return redirect('checkcreds')
     cursor = get_db().cursor()
     sql = "SELECT * FROM user_ratings WHERE itemid = ? AND userid = ?"
@@ -723,6 +744,9 @@ def admin():
     return render_template('admin.html', users=users, topics=topics, items=items)
 
 
+
+# ------------------------------------------- ERROR HANDLERS  ------------------------------------------- #
+
 # 404 ERROR HANDLING
 @app.errorhandler(404)
 def error_404(error):
@@ -738,6 +762,7 @@ def error_500(error):
         error = "Please sign in first"
         return render_template('signin.html', error=error)
     return render_template('error.html', title=title, error=error), 500
+
 
 
 # ------------------------------------------ RUNNING THE APP  ------------------------------------------ #
