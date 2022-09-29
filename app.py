@@ -1,10 +1,13 @@
 # --------------------------------------------- SETTING UP --------------------------------------------- #
 
 # IMPORTS
-from pydoc import render_doc
 from flask import Flask, render_template, g, request, redirect, url_for, session, flash
 from werkzeug.utils import secure_filename
-import sqlite3, hashlib, uuid, os, re
+from flask_mail import Message, Mail
+from dotenv import load_dotenv
+from pathlib import Path
+
+import sqlite3, hashlib, os, re
 
 
 # SETTING CONSTANTS FOR UPLOADS AND DATABASE NAME
@@ -16,17 +19,18 @@ DATABASE = "./topinfdb/topinfinity.db"
 # CONFIGURING UPLOADS, FLASK APP, AND REGEX
 regex = '(^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$)'
 app = Flask(__name__, template_folder="templates")
+mail = Mail(app)
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024
 app.config['UPLOAD_EXTENSIONS'] = ['.jpeg', '.jpg', '.png', '.gif', 'JPG']
 
 
 # GET KEY FROM HIDDEN FILE (NOT ON GITHUB)
-with open('key.txt') as f:
-    key = f.readlines()[0]
-salt = key
-app.secret_key = key
-
+dotenv_path = Path('secrets.env')
+load_dotenv(dotenv_path=dotenv_path)
+salt = os.getenv('SALT')
+app.secret_key = os.getenv('SECRETKEY')
+email_password = os.getenv('PASSWORD')
 
 # ------------------------------------------- BASIC FUNCTIONS ------------------------------------------- #
 
@@ -218,12 +222,10 @@ def delete_item(itemid):
         sql = "SELECT userid, topicid FROM items WHERE id = ?"
         cursor.execute(sql, (itemid, ))
         useriditem = cursor.fetchall()
-        print(useriditem)
         cursor = get_db().cursor()
         sql = "SELECT userid FROM topics WHERE id = ?"
         cursor.execute(sql, (useriditem[0][1], ))
         useridtopic = cursor.fetchall()
-        print(useridtopic)
         if useriditem[0][0] != session['userid'] and useridtopic[0][0] != session['userid']:
             return redirect(url_for('checkcreds'))
     cursor = get_db().cursor()
@@ -344,7 +346,6 @@ def signup_post():
     cursor.execute(sql)
     emails = cursor.fetchall()
     list_items(emails)
-    print((re.search(regex, email)))
     # error checking
     error = "none"
     if username in usernames:
@@ -437,12 +438,24 @@ def upload_image():
 def pwdupdate():
     password = request.form['password']
     confpassword = request.form["confpassword"]
+    oldpassword = request.form['oldpassword']
+    # get correct old password
+    cursor = get_db().cursor()
+    sql = "SELECT password FROM users WHERE id = ?"
+    cursor.execute(sql, (session['userid'], ))
+    currentpassword = cursor.fetchone()[0]
+    h = oldpassword + salt
+    oldpassword = hashlib.md5(h.encode()).hexdigest()
     # error checking
     error = "none"
     if empty(password, " password") != "none":
         error = empty(password, " password")
     elif password != confpassword:
         error = "Passwords don't match"
+    elif session['password'] != currentpassword:
+        return redirect(url_for('checkcreds'))
+    elif currentpassword != oldpassword:
+        error = "Your current password is wrong"
     if error == "none":
         # password hashing
         h = password + salt
@@ -619,6 +632,9 @@ def topic(topicid):
 def rate(itemid):
     formrating = f"rating.{itemid}"
     rating = request.form[formrating]
+    if rating != 1 and rating != 2 and rating != 3 and rating != 4 and rating != 5:
+        session['error'] = "Go away Sam"
+        return redirect('checkcreds')
     cursor = get_db().cursor()
     sql = "SELECT * FROM user_ratings WHERE itemid = ? AND userid = ?"
     cursor.execute(sql, (itemid, session['userid'],))
@@ -671,7 +687,6 @@ def additem():
 # LET USER CHANGE THE ACCENT COLOUR OF THE WEBSITE
 @app.get('/colorchange/<hex>')
 def colorchange(hex):
-    print(hex)
     if "#" not in hex:
         hex = "fun"
     # change the colour of the session

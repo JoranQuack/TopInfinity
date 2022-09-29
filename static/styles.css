@@ -332,9 +332,9 @@ form input {
 
 .profile-info {
     position: relative;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
+    top: 40%;
+    left: 60%;
+    transform: translate(-60%, -40%);
 }
 
 .accbox img {
@@ -344,8 +344,8 @@ form input {
 }
 
 .left-accbox form {
-    margin-top: 5.5vw;
-    margin-bottom: 5.2vw;
+    margin-top: 8.5vw;
+    margin-bottom: 8.2vw;
 }
 
 input[type="file"] {
@@ -354,13 +354,13 @@ input[type="file"] {
 
 .left-accbox label {
     font-size: 1.5vw;
-    padding: 4.5vw 10vw;
+    padding: 7.5vw 10vw;
     box-shadow: none;
     border: 0.3vw dashed var(--primary-color);
     cursor: pointer;
 }
 
-.color-accbox {
+.pfp-accbox {
     margin-top: 2.2vw;
 }
 
@@ -959,6 +959,27 @@ input[type="text"] {
     .edit-button {
         height: 4.5vw;
         width: 4.5vw;
+    }
+
+    .pwdupdate-form button {
+        font-size: 3.5vw;
+        padding: 1.5vw 2vw;
+    }
+
+    .pwdupdate-form input {
+        margin-bottom: 2vw;
+    }
+
+    .right-accbox div {
+        padding-bottom: 5vw;
+    }
+
+    .pfp-accbox h1 {
+        margin-bottom: 5vw;
+    }
+
+    .left-accbox form {
+        margin-bottom: 1vw;
     }
 
     .inline-edit {
