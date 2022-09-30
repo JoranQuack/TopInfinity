@@ -584,6 +584,12 @@ def edittopic(topicid):
 # ENTER EDITED TOPIC DETAILS INTO DATABASE
 @app.post('/edittopic')
 def edittopic_post():
+    cursor = get_db().cursor()
+    sql = "SELECT * FROM topics WHERE id = ?"
+    cursor.execute(sql, (session['topicid'], ))
+    topic = cursor.fetchall()
+    if topic[0][1] != session['userid']:
+        return redirect(url_for('checkcreds'))
     # error check and format everything
     title = request.form['title'].capitalize()
     description = request.form['description']
