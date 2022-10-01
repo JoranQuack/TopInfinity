@@ -272,8 +272,11 @@ def home():
     session['adminmode'] = False
     # default errors to false
     session['error'] = False
-    # default messages to false
-    message = session['message']
+    # default messages to false, note message if there is one
+    try:
+        message = session['message']
+    except:
+        message = "none"
     session['message'] = False
     # run the functions that organise the home page items to be in the most relevant order
     average_items()
