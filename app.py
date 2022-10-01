@@ -4,8 +4,10 @@
 from flask import Flask, render_template, g, request, redirect, url_for, session, flash
 from werkzeug.utils import secure_filename
 from email.message import EmailMessage
-from flask_mail import Message, Mail
+from flask_mail import Mail
 from dotenv import load_dotenv
+from random import randint
+from datetime import date
 from pathlib import Path
 
 import sqlite3, hashlib, os, re, smtplib, ssl
@@ -23,7 +25,7 @@ app = Flask(__name__, template_folder="templates")
 mail = Mail(app)
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024
-app.config['UPLOAD_EXTENSIONS'] = ['.jpeg', '.jpg', '.png', '.gif', 'JPG']
+app.config['UPLOAD_EXTENSIONS'] = ['.jpeg', '.jpg', '.png', '.gif', '.JPG']
 allowed_ratings = ["1", "2", "3", "4", "5"]
 
 
@@ -163,12 +165,12 @@ def hash_manager(password, username):
 
 
 # SEND EMAILS
-def email(email_receiver, username, confirmkey):
+def sendemail(email_receiver, username, confirm_key):
     em = EmailMessage()
     em['From'] = email_sender
     em['To'] = email_receiver
     em['Subject'] = f"{username}, please verify your new Top Infinity account."
-    em.set_content("ooga booga joran is cool! https://topinfinity.blackdahu.com/confirm/")
+    em.set_content(f"Please click this link to confirm your account: https://topinfinity.blackdahu.com/confirm/{confirm_key}")
     context = ssl.create_default_context()
     with smtplib.SMTP_SSL('smtp.gmail.com', 465, context=context) as smtp:
         smtp.login(email_sender, email_password)
@@ -266,12 +268,12 @@ def delete_item(itemid):
 # HOME ROUTE
 @app.route("/home")
 def home():
-    # email(session['email'], session['username'], session['userid'])
     # default to disabling adminmode
     session['adminmode'] = False
     # default errors to false
     session['error'] = False
     # default messages to false
+    message = session['message']
     session['message'] = False
     # run the functions that organise the home page items to be in the most relevant order
     average_items()
@@ -288,7 +290,7 @@ def home():
         items = cursor.fetchall()
         topic = topic + (tuple(list_items(items)), )
         topics[i] = topic
-    return render_template('home.html', topics=topics, enumerate=enumerate)
+    return render_template('home.html', topics=topics, enumerate=enumerate, message=message)
 
 
 # SIGNIN (ALSO USED TO MAKE SURE USER IS LOGGED IN BEFORE RETURNING TO HOME.HTML)
@@ -317,14 +319,17 @@ def checkcreds():
     sql = "SELECT * FROM users WHERE username = ?"
     cursor.execute(sql, (session['username'], ))
     usercreds = cursor.fetchall()
-    session['email'] = usercreds[0][4]
-    session['pfp'] = usercreds[0][3]
+    email = usercreds[0][4]
     session['userid'] = usercreds[0][0]
-    session['color'] = "#5630a8"
-    if usercreds[0][5]:
-        session['color'] = usercreds[0][5]
+    session['adminmode'] = False
+    color = usercreds[0][5]
+    if len(color) == 17:
+        return render_template('waiting.html', email=email, userid=session['userid'])
     if error == "Please sign in first": 
         return redirect(request.referrer)
+    session['pfp'] = usercreds[0][3]
+    session['email'] = email
+    session['color'] = color
     return redirect(url_for('home'))
 
 
@@ -393,19 +398,70 @@ def signup_post():
     # password hashing
     h = password + salt
     password = hashlib.md5(h.encode()).hexdigest()
-    # insert all credentials in the database and tell user to sign in again
+    # create random key for email verification, and add the date for expiry handling
+    key = randint(100000000, 999999999)
+    today = date.today()
+    today = int(today.strftime("%Y%m%d"))
+    state = str(today) + str(key)
     cursor = get_db().cursor()
     sql = "INSERT INTO users(username, password, pfp, email, color) VALUES(?,?,?,?,?)"
-    cursor.execute(sql, (username, password, "default.png", email, "#5630a8"))
+    cursor.execute(sql, (username, password, "default.png", email, state))
     get_db().commit()
-    message = "Account has been created, please sign in"
-    return render_template('signin.html', message=message)
+    # send user to the waiting html
+    cursor = get_db().cursor()
+    sql = "SELECT last_insert_rowid()"
+    cursor.execute(sql)
+    userid = cursor.fetchone()
+    session['adminmode'] = False
+    session['userid'] = userid[0]
+    sendemail(email, username, state)
+    return render_template('waiting.html', email=email, userid=userid[0])
 
 
 # RENDER THE SIGNUP PAGE
 @app.get("/signup")
 def signup():
     return render_template('signup.html')
+
+
+# CONFIRM EMAIL
+@app.route("/confirm/<int:key>")
+def confirm(key):
+    cursor = get_db().cursor()
+    sql = "SELECT * FROM users WHERE color = ?"
+    cursor.execute(sql, (key, ))
+    userinfo = cursor.fetchall()
+    key = str(key)
+    today = date.today()
+    today = str(int(today.strftime("%Y%m%d")))
+    keydate = key[0:8]
+    print(keydate)
+    print(today)
+    if len(userinfo) == 0:
+        title = "How'd you get here?"
+        error = "The link you've gone to seems to be invalid, please sign in."
+        return render_template('error.html', title=title, error=error)
+    elif keydate != today:
+        cursor = get_db().cursor()
+        sql = "DELETE FROM users WHERE id = ?"
+        cursor.execute(sql, (userinfo[0][0], ))
+        get_db().commit()
+        title = "You're out of time!"
+        error = "That link is now expired. We've deleted your account, so sign up again to make another!"
+        return render_template('error.html', title=title, error=error)
+    session['userid'] = userinfo[0][0]
+    session['username'] = userinfo[0][1]
+    session['password'] = userinfo[0][2]
+    session['pfp'] = userinfo[0][3]
+    session['email'] = userinfo[0][4]
+    session['color'] = "#5630a8"
+    cursor = get_db().cursor()
+    sql = "UPDATE users SET color = ? WHERE id = ?"
+    cursor.execute(sql, (session['color'], session['userid']))
+    get_db().commit()
+    session['message'] = "Email has been verified"
+    return redirect(url_for('checkcreds'))
+
 
 
 # RENDER USER ACCOUNT PAGE
@@ -439,12 +495,18 @@ def upload_image():
     file = request.files['file']
     filename = secure_filename(file.filename)
     if filename != '':
+        # make sure to not overwite other files
         file_ext = os.path.splitext(filename)[1]
+        pfps = os.listdir('static/pfps/')
+        while filename in pfps:
+            root = os.path.splitext(filename)[0]
+            filename = root + "ya" + file_ext
         if file_ext not in app.config['UPLOAD_EXTENSIONS']:
             error = "Allowed image types are: png, jpg, jpeg, gif"
             return render_template('account.html', error=error)
+        # save the file
         file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
-    # set new pfp to that user
+    # set new pfp to that user in session and db
     session['pfp'] = filename
     cursor = get_db().cursor()
     sql = "UPDATE users SET pfp = ? WHERE id = ?"
@@ -749,6 +811,31 @@ def admin():
     items = cursor.fetchall()
     return render_template('admin.html', users=users, topics=topics, items=items)
 
+
+# RUN CLEAN UPS ON APP START
+@app.before_first_request
+def cleanup():
+    # remove unused pfps
+    cursor = get_db().cursor()
+    sql = "SELECT pfp FROM users"
+    cursor.execute(sql)
+    usedpfps = cursor.fetchall()
+    list_items(usedpfps)
+    pfps = os.listdir('static/pfps/')
+    for pfp in pfps:
+        if pfp not in usedpfps:
+            os.remove(f"static/pfps/{pfp}")
+    # remove unconfirmed accounts from the database
+    cursor = get_db().cursor()
+    sql = "SELECT id, color FROM users"
+    cursor.execute(sql)
+    users = cursor.fetchall()
+    for user in users:
+        if len(user[1]) == 17:
+            cursor = get_db().cursor()
+            sql = "DELETE FROM users WHERE id = ?"
+            cursor.execute(sql, (user[0], ))
+            get_db().commit()
 
 
 # ------------------------------------------- ERROR HANDLERS  ------------------------------------------- #

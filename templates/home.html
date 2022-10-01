@@ -45,4 +45,10 @@
 </div>
 {%endfor%}
 
+{%if message and message != "none" and message != False%}
+<div class="error message">
+	<p>{{message}}</p>
+</div>
+{%endif%}
+
 {% endblock %}
