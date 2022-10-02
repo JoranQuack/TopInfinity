@@ -34,6 +34,7 @@ dotenv_path = Path('secrets.env')
 load_dotenv(dotenv_path=dotenv_path)
 salt = os.getenv('SALT')
 app.secret_key = os.getenv('SECRETKEY')
+
 #set up emailing system
 email_sender = 'noreplytopinfinity@gmail.com'
 email_password = os.getenv('PASSWORD')
@@ -87,7 +88,7 @@ def character_limit(check, number):
 
 
 # CHECK FOR EMPTY INPUTS
-def empty(input, type):
+def empty(input: str, type):
     error = "none"
     if input.strip() == "":
         error = f"Please enter a{type}"
@@ -96,6 +97,7 @@ def empty(input, type):
 
 # AVERAGE ALL ITEMS' RATINGS
 def average_items():
+
     # average and then sync the ratings of each item with the user_ratings
     cursor = get_db().cursor()
     sql = "SELECT id FROM items"
@@ -147,8 +149,7 @@ def popularity_topics():
 
 # SALT OLD UNSALTED PASSWORDS IF NOT SALTED
 def hash_manager(password, username):
-    salted_password = password + salt
-    salted_password = hashlib.md5(salted_password.encode()).hexdigest()
+    salted_password = hashlib.md5((password + salt).encode()).hexdigest()
     unsalted_password = hashlib.md5(password.encode()).hexdigest()
     cursor = get_db().cursor()
     sql = "SELECT password FROM users WHERE username = ?"
@@ -190,6 +191,7 @@ def delete_account(userid):
         sql = "DELETE FROM users WHERE id=?"
         cursor.execute(sql, (userid, ))
         get_db().commit()
+
         # delete all ratings and topics that the user has previously made
         cursor = get_db().cursor()
         sql = "DELETE FROM user_ratings WHERE userid=?"
@@ -202,6 +204,7 @@ def delete_account(userid):
         list_items(topics)
         for topicid in topics:
             delete_topic(topicid)
+
     # redirect to admin page if adminmode is enabled
     if session['adminmode'] == True:
         return redirect(url_for('admin'))
@@ -223,6 +226,7 @@ def delete_topic(topicid):
     sql = "DELETE FROM topics WHERE id=?"
     cursor.execute(sql, (topicid, ))
     get_db().commit()
+
     # delete all items inside the topic
     cursor = get_db().cursor()
     sql = "SELECT id FROM items WHERE topicid = ?"
@@ -254,6 +258,7 @@ def delete_item(itemid):
     sql = "DELETE FROM items WHERE id=?"
     cursor.execute(sql, (itemid, ))
     get_db().commit()
+    
     # delete all user ratings associated with the item
     cursor = get_db().cursor()
     sql = "DELETE FROM user_ratings WHERE itemid=?"
@@ -268,19 +273,24 @@ def delete_item(itemid):
 # HOME ROUTE
 @app.route("/home")
 def home():
+
     # default to disabling adminmode
     session['adminmode'] = False
+
     # default errors to false
     session['error'] = False
+
     # default messages to false, note message if there is one
     try:
         message = session['message']
     except:
         message = "none"
     session['message'] = False
+    
     # run the functions that organise the home page items to be in the most relevant order
     average_items()
     popularity_topics()
+
     # select topics and their top 8 items to show on the home screen
     cursor = get_db().cursor()
     sql = "SELECT topics.title, topics.description, users.username, users.pfp, topics.id FROM topics JOIN users ON topics.userid = users.id ORDER BY topics.popularity DESC"
@@ -299,25 +309,41 @@ def home():
 # SIGNIN (ALSO USED TO MAKE SURE USER IS LOGGED IN BEFORE RETURNING TO HOME.HTML)
 @app.get("/")
 def checkcreds():
+
+    # check if sessions are used, if not, go to welcome page
     error = "none"
     if 'username' not in session:
         return render_template('welcome.html')
+
+    # username is valid and if it's an email get the username of that email
+    cursor = get_db().cursor()
+    sql = "SELECT username FROM users WHERE username = ?"
+    cursor.execute(sql, (session['username'], ))
+    username = cursor.fetchall()
+    if len(username) == 0:
+        cursor = get_db().cursor()
+        sql = "SELECT username FROM users WHERE email = ?"
+        cursor.execute(sql, (session['username'], ))
+        email = cursor.fetchall()
+        if len(email) == 0:
+            error = "Credentials are incorrect"
+        else:
+            session['username'] = email[0][0]
+        
+    # check that password
     cursor = get_db().cursor()
     sql = "SELECT password FROM users WHERE username = ?"
     cursor.execute(sql, (session['username'], ))
     passwords = cursor.fetchall()
     list_items(passwords)
     if session['password'] not in passwords:
-        error = "Incorrect password, please try again"
-    cursor = get_db().cursor()
-    sql = "SELECT username FROM users"
-    cursor.execute(sql)
-    usernames = cursor.fetchall()
-    list_items(usernames)
-    if session['username'] not in usernames:
-        error = "Username does not exist"
+        error = "Credentials are incorrect"
+    
+    # do funky stuff if there is an error
     if error != "none":
         return render_template('signin.html', error=error)
+    
+    # fill in the session gaps and put the user in waiting if unverified
     cursor = get_db().cursor()
     sql = "SELECT * FROM users WHERE username = ?"
     cursor.execute(sql, (session['username'], ))
@@ -339,6 +365,7 @@ def checkcreds():
 # RENDER SIGNIN PAGE AND PUT CREDS IN SESSION FOR ERROR CHECKING
 @app.route("/signin", methods=['GET', 'POST'])
 def signin():
+
     # get the form details if a form was submitted
     if request.method == 'POST':
         session['username'] = request.form['username']
@@ -358,23 +385,27 @@ def signin():
 # SIGN UP FUNCTION WITH ALL ERROR CHECKING
 @app.post('/signup')
 def signup_post():
+
     # default set error to none and get the inputed creds from user
     username = request.form['username']
     password = request.form['password']
     confpassword = request.form["confpassword"]
     email = request.form['email']
+
     # check for character limit errors and already used usernames
     cursor = get_db().cursor()
     sql = "SELECT username FROM users"
     cursor.execute(sql)
     usernames = cursor.fetchall()
     list_items(usernames)
+
     # use regex to validate email
     cursor = get_db().cursor()
     sql = "SELECT email FROM users"
     cursor.execute(sql)
     emails = cursor.fetchall()
     list_items(emails)
+
     # error checking
     error = "none"
     if username in usernames:
@@ -395,21 +426,24 @@ def signup_post():
         error = empty(username, " username")
     elif password != confpassword:
         error = "Passwords don't match"
+
     # return to signup page with error if there are any
     if error != "none":
         return render_template('signup.html', error=error, username=username, email=email, password=password)
+    
     # password hashing
     h = password + salt
     password = hashlib.md5(h.encode()).hexdigest()
+
     # create random key for email verification, and add the date for expiry handling
     key = randint(100000000, 999999999)
-    today = date.today()
-    today = int(today.strftime("%Y%m%d"))
+    today = int(date.today().strftime("%Y%m%d"))
     state = str(today) + str(key)
     cursor = get_db().cursor()
     sql = "INSERT INTO users(username, password, pfp, email, color) VALUES(?,?,?,?,?)"
     cursor.execute(sql, (username, password, "default.png", email, state))
     get_db().commit()
+
     # send user to the waiting html
     cursor = get_db().cursor()
     sql = "SELECT last_insert_rowid()"
@@ -430,21 +464,20 @@ def signup():
 # CONFIRM EMAIL
 @app.route("/confirm/<int:key>")
 def confirm(key):
+
+    # search for the key on the database
     cursor = get_db().cursor()
     sql = "SELECT * FROM users WHERE color = ?"
     cursor.execute(sql, (key, ))
     userinfo = cursor.fetchall()
+
+    # get the key and the date
     key = str(key)
-    today = date.today()
-    today = str(int(today.strftime("%Y%m%d")))
+    today = str(int(date.today().strftime("%Y%m%d")))
     keydate = key[0:8]
-    print(keydate)
-    print(today)
-    if len(userinfo) == 0:
-        title = "How'd you get here?"
-        error = "The link you've gone to seems to be invalid, please sign in."
-        return render_template('error.html', title=title, error=error)
-    elif keydate != today:
+
+    # check if key expired
+    if keydate != today:
         cursor = get_db().cursor()
         sql = "DELETE FROM users WHERE id = ?"
         cursor.execute(sql, (userinfo[0][0], ))
@@ -452,12 +485,22 @@ def confirm(key):
         title = "You're out of time!"
         error = "That link is now expired. We've deleted your account, so sign up again to make another!"
         return render_template('error.html', title=title, error=error)
+    
+    # check if key is in db
+    elif len(userinfo) == 0:
+        title = "How'd you get here?"
+        error = "The link you've gone to seems to be invalid, please sign in."
+        return render_template('error.html', title=title, error=error)
+
+    # set those session variables oh yeah
     session['userid'] = userinfo[0][0]
     session['username'] = userinfo[0][1]
     session['password'] = userinfo[0][2]
     session['pfp'] = userinfo[0][3]
     session['email'] = userinfo[0][4]
     session['color'] = "#5630a8"
+
+    # confirm account by changing colour back to default
     cursor = get_db().cursor()
     sql = "UPDATE users SET color = ? WHERE id = ?"
     cursor.execute(sql, (session['color'], session['userid']))
@@ -470,6 +513,7 @@ def confirm(key):
 # RENDER USER ACCOUNT PAGE
 @app.route("/account")
 def account():
+
     # select topics and their top 8 items to show on the home screen
     cursor = get_db().cursor()
     sql = "SELECT topics.title, topics.description, users.username, users.pfp, topics.id FROM topics JOIN users ON topics.userid = users.id WHERE topics.userid = ? ORDER BY topics.popularity DESC"
@@ -492,12 +536,14 @@ def account():
 # UPLOAD A NEW PROFILE PICTURE
 @app.route('/pfp', methods=['POST'])
 def upload_image():
+
     # check for ILLEGAL filetypes
     if 'file' not in request.files:
         flash('No file part')
     file = request.files['file']
     filename = secure_filename(file.filename)
     if filename != '':
+
         # make sure to not overwite other files
         file_ext = os.path.splitext(filename)[1]
         pfps = os.listdir('static/pfps/')
@@ -507,8 +553,10 @@ def upload_image():
         if file_ext not in app.config['UPLOAD_EXTENSIONS']:
             error = "Allowed image types are: png, jpg, jpeg, gif"
             return render_template('account.html', error=error)
+
         # save the file
         file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+
     # set new pfp to that user in session and db
     session['pfp'] = filename
     cursor = get_db().cursor()
@@ -525,6 +573,7 @@ def pwdupdate():
     password = request.form['password']
     confpassword = request.form["confpassword"]
     oldpassword = request.form['oldpassword']
+
     # get correct old password
     cursor = get_db().cursor()
     sql = "SELECT password FROM users WHERE id = ?"
@@ -532,6 +581,7 @@ def pwdupdate():
     currentpassword = cursor.fetchone()[0]
     h = oldpassword + salt
     oldpassword = hashlib.md5(h.encode()).hexdigest()
+
     # error checking
     error = "none"
     if empty(password, " password") != "none":
@@ -543,9 +593,11 @@ def pwdupdate():
     elif currentpassword != oldpassword:
         error = "Your current password is wrong"
     if error == "none":
+
         # password hashing
         h = password + salt
         password = hashlib.md5(h.encode()).hexdigest()
+
         # put in db
         cursor = get_db().cursor()
         sql = "UPDATE users SET password = ? WHERE id = ?"
@@ -561,6 +613,7 @@ def pwdupdate():
 # LOGOUT AND CLEAR SESSION
 @app.route('/logout')
 def logout():
+
     # remove all user creds from the session
     session.clear()
     return redirect(url_for('checkcreds'))
@@ -599,6 +652,7 @@ def userdelete_item(itemid):
 # ADDING A TOPIC ROUTE
 @app.route('/addtopic', methods=['POST', 'GET'])
 def addtopic():
+
     # add topic details into db and error check
     if request.method == 'POST':
         title = request.form['title'].capitalize()
@@ -626,6 +680,7 @@ def addtopic():
             return redirect(url_for('topic', topicid=topicid[0][0]))
         else:
             return render_template('addtopic.html', error=error, title=title, description=description)
+
     # render the add topic page if not submitting a form
     else:
         return render_template('addtopic.html')
@@ -634,6 +689,7 @@ def addtopic():
 # EDITING EXISTING TOPIC
 @app.get('/edittopic/<int:topicid>')
 def edittopic(topicid):
+
     # get the existing topic info to prefill the form
     session['topicid'] = topicid
     cursor = get_db().cursor()
@@ -655,6 +711,7 @@ def edittopic_post():
     topic = cursor.fetchall()
     if topic[0][1] != session['userid']:
         return redirect(url_for('checkcreds'))
+
     # error check and format everything
     title = request.form['title'].capitalize()
     description = request.form['description']
@@ -669,6 +726,7 @@ def edittopic_post():
         error = empty(title, " title")
     elif empty(description, " description") != "none":
         error = empty(description, " description")
+
     # update db if no error
     if error == "none":
         cursor = get_db().cursor()
@@ -676,6 +734,7 @@ def edittopic_post():
         cursor.execute(sql, (title, description, session['topicid']))
         get_db().commit()
         return redirect(url_for('topic', topicid=session['topicid']))
+
     # go back to the edit topic page if there is an error and display
     else:
         cursor = get_db().cursor()
@@ -689,6 +748,7 @@ def edittopic_post():
 @app.get('/topic/<int:topicid>')
 def topic(topicid):
     session['topicid'] = topicid
+
     # get all of the topic info and items (with their info)
     cursor = get_db().cursor()
     sql = "SELECT topics.title, topics.description, users.username, users.pfp, topics.userid, topics.id FROM topics JOIN users ON topics.userid = users.id WHERE topics.id = ?"
@@ -702,6 +762,7 @@ def topic(topicid):
     sql = "SELECT rating, itemid FROM user_ratings WHERE userid = ?"
     cursor.execute(sql, (session['userid'], ))
     user_ratings = cursor.fetchall()
+
     # convert number ratings into star selections and add them to the end of the tuple of each item
     checked_numbers = {5: (0, 0, 0, 0, "checked"), 4: (0, 0, 0, "checked", 0), 3: (
         0, 0, "checked", 0, 0), 2: (0, "checked", 0, 0, 0), 1: ("checked", 0, 0, 0, 0), 0: (0, 0, 0, 0, 0)}
@@ -715,6 +776,7 @@ def topic(topicid):
         if len(item) == 4:
             item = item + (checked_numbers[0], )
         items[i] = item
+
     # manage errors
     error = session['error']
     return render_template('topic.html', topics=topics, items=items, enumerate=enumerate, error=error)
@@ -731,6 +793,7 @@ def rate(itemid):
     sql = "SELECT * FROM user_ratings WHERE itemid = ? AND userid = ?"
     cursor.execute(sql, (itemid, session['userid'],))
     previousrating = cursor.fetchall()
+
     # update rating if there is already one, create a new one if not
     if len(previousrating) == 0:
         cursor = get_db().cursor()
@@ -749,9 +812,11 @@ def rate(itemid):
 # ADD ITEM INTO A TOPIC
 @app.post('/additem')
 def additem():
+
     # format item name to look nice
     name = request.form['itemname'].capitalize()
     name = name.strip()
+
     # make sure it's not already in the database
     cursor = get_db().cursor()
     sql = "SELECT name FROM items WHERE topicid = ?"
@@ -781,8 +846,10 @@ def additem():
 def colorchange(hex):
     if "#" not in hex:
         hex = "fun"
+
     # change the colour of the session
     session['color'] = hex
+
     # store their preference with their user in db
     cursor = get_db().cursor()
     sql = "UPDATE users SET color = ? WHERE id = ?"
@@ -794,11 +861,14 @@ def colorchange(hex):
 # ADMIN PAGE
 @app.get('/admin')
 def admin():
+
     # redirect anyone who isn't me back to the home page
     if session['userid'] != 76:
         return redirect(url_for('checkcreds'))
+
     # enable adminmode for easier re routing to the same page when removing stuff
     session['adminmode'] = True
+
     # select all info tables (excluding user_rating because that is just a bridging table)
     cursor = get_db().cursor()
     sql = "SELECT * FROM users"
@@ -818,6 +888,7 @@ def admin():
 # RUN CLEAN UPS ON APP START
 @app.before_first_request
 def cleanup():
+
     # remove unused pfps
     cursor = get_db().cursor()
     sql = "SELECT pfp FROM users"
@@ -828,6 +899,7 @@ def cleanup():
     for pfp in pfps:
         if pfp not in usedpfps:
             os.remove(f"static/pfps/{pfp}")
+
     # remove unconfirmed accounts from the database
     cursor = get_db().cursor()
     sql = "SELECT id, color FROM users"
