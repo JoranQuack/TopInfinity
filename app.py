@@ -844,8 +844,18 @@ def additem():
 # LET USER CHANGE THE ACCENT COLOUR OF THE WEBSITE
 @app.get('/colorchange/<hex>')
 def colorchange(hex):
+
+    # cool funky random easter egg just for shane
     if "#" not in hex:
         hex = "fun"
+
+    # make sure that the user isn't unverified
+    cursor = get_db().cursor()
+    sql = "SELECT color FROM users WHERE id = ?"
+    cursor.execute(sql, (session['color'], ))
+    state = cursor.fetchall()
+    if len(state[0][0]) == 17:
+        return redirect(url_for('checkcreds'))
 
     # change the colour of the session
     session['color'] = hex
