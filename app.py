@@ -907,7 +907,7 @@ def cleanup():
     list_items(usedpfps)
     pfps = os.listdir('static/pfps/')
     for pfp in pfps:
-        if pfp not in usedpfps:
+        if pfp not in usedpfps and pfp != "default.png":
             os.remove(f"static/pfps/{pfp}")
 
     # remove unconfirmed accounts from the database
