@@ -852,7 +852,7 @@ def colorchange(hex):
     # make sure that the user isn't unverified
     cursor = get_db().cursor()
     sql = "SELECT color FROM users WHERE id = ?"
-    cursor.execute(sql, (session['color'], ))
+    cursor.execute(sql, (session['userid'], ))
     state = cursor.fetchall()
     if len(state[0][0]) == 17:
         return redirect(url_for('checkcreds'))

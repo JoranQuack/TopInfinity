@@ -1,3 +1,5 @@
 
 secrets.env
 topinfdb/topinfinity.db
+topinfdb/topinfinity.db
+*.db
