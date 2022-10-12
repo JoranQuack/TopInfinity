@@ -38,6 +38,7 @@ app.secret_key = os.getenv('SECRETKEY')
 #set up emailing system
 email_sender = 'noreplytopinfinity@gmail.com'
 email_password = os.getenv('PASSWORD')
+ALLOWED_DOMAINS = ["gmail", "yahoo", "burnside", "hotmail", "aol", "msn", "outlook", "live"]
 
 
 
@@ -391,6 +392,8 @@ def signup_post():
     password = request.form['password']
     confpassword = request.form["confpassword"]
     email = request.form['email']
+    email_domain = email.split("@")[1].split(".")[0]
+    print(email_domain)
 
     # check for character limit errors and already used usernames
     cursor = get_db().cursor()
@@ -412,6 +415,8 @@ def signup_post():
         error = "Username is already in use, please choose something else"
     elif (re.search(regex, email)) == None:
         error = "Email is invalid"
+    elif email_domain not in ALLOWED_DOMAINS:
+        error = "Email domain is not supported"
     elif email in emails:
         error = "Email is already in use"
     elif character_limit(username, 20) != "none":
