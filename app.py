@@ -111,7 +111,7 @@ def average_items():
         cursor.execute(sql, (number, ))
         allratings = cursor.fetchall()
         list_items(allratings)
-        if len(allratings) > 2:
+        if len(allratings) > 1:
             ratingavg = sum(allratings) / len(allratings)
         else:
             ratingavg = 0
@@ -660,6 +660,9 @@ def addtopic():
 
     # add topic details into db and error check
     if request.method == 'POST':
+        state = session['color'] 
+        if len(state) == 17:
+            return redirect(url_for('checkcreds'))
         title = request.form['title'].capitalize()
         description = request.form['description']
         error = "none"
