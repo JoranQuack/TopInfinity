@@ -4,8 +4,8 @@
 from flask import Flask, render_template, g, request, redirect, url_for, session, flash
 from werkzeug.utils import secure_filename
 from email.message import EmailMessage
-from flask_mail import Mail
 from dotenv import load_dotenv
+from flask_mail import Mail
 from random import randint
 from datetime import date
 from pathlib import Path
@@ -38,7 +38,7 @@ app.secret_key = os.getenv('SECRETKEY')
 #set up emailing system
 email_sender = 'noreplytopinfinity@gmail.com'
 email_password = os.getenv('PASSWORD')
-ALLOWED_DOMAINS = ["gmail", "yahoo", "burnside", "hotmail", "aol", "msn", "outlook", "live"]
+ALLOWED_DOMAINS = ["gmail", "yahoo", "burnside", "hotmail", "aol", "msn", "outlook", "live", "icloud"]
 
 
 
@@ -660,7 +660,7 @@ def addtopic():
 
     # add topic details into db and error check
     if request.method == 'POST':
-        state = session['color'] 
+        state = session['color']
         if len(state) == 17:
             return redirect(url_for('checkcreds'))
         title = request.form['title'].capitalize()
@@ -793,6 +793,13 @@ def topic(topicid):
 # SUBMIT A RATING FOR A SPECIFIC ITEM
 @app.post('/rate/<int:itemid>')
 def rate(itemid):
+
+    # make sure account is verified
+    state = session['color']
+    if len(state) == 17:
+        return redirect(url_for('checkcreds'))
+
+    # organise variables and get previous ratings if there are any
     formrating = f"rating.{itemid}"
     rating = request.form[formrating]
     if rating not in allowed_ratings:
@@ -820,6 +827,11 @@ def rate(itemid):
 # ADD ITEM INTO A TOPIC
 @app.post('/additem')
 def additem():
+
+    # make sure account is verified
+    state = session['color']
+    if len(state) == 17:
+        return redirect(url_for('checkcreds'))
 
     # format item name to look nice
     name = request.form['itemname'].capitalize()
@@ -907,17 +919,6 @@ def admin():
 @app.before_first_request
 def cleanup():
 
-    # remove unused pfps
-    cursor = get_db().cursor()
-    sql = "SELECT pfp FROM users"
-    cursor.execute(sql)
-    usedpfps = cursor.fetchall()
-    list_items(usedpfps)
-    pfps = os.listdir('static/pfps/')
-    for pfp in pfps:
-        if pfp not in usedpfps and pfp != "default.png":
-            os.remove(f"static/pfps/{pfp}")
-
     # remove unconfirmed accounts from the database
     cursor = get_db().cursor()
     sql = "SELECT id, color FROM users"
@@ -929,6 +930,17 @@ def cleanup():
             sql = "DELETE FROM users WHERE id = ?"
             cursor.execute(sql, (user[0], ))
             get_db().commit()
+
+    # remove unused pfps
+    cursor = get_db().cursor()
+    sql = "SELECT pfp FROM users"
+    cursor.execute(sql)
+    usedpfps = cursor.fetchall()
+    list_items(usedpfps)
+    pfps = os.listdir('static/pfps/')
+    for pfp in pfps:
+        if pfp not in usedpfps and pfp != "default.png":
+            os.remove(f"static/pfps/{pfp}")
 
 
 # ------------------------------------------- ERROR HANDLERS  ------------------------------------------- #
