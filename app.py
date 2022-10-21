@@ -103,21 +103,22 @@ def average_items():
     cursor = get_db().cursor()
     sql = "SELECT id FROM items"
     cursor.execute(sql)
-    allitems = cursor.fetchall()
-    list_items(allitems)
-    for number in allitems:
+    all_items = cursor.fetchall()
+    list_items(all_items)
+    for number in all_items:
         cursor = get_db().cursor()
         sql = "SELECT rating FROM user_ratings WHERE itemid = ?"
         cursor.execute(sql, (number, ))
-        allratings = cursor.fetchall()
-        list_items(allratings)
-        if len(allratings) > 1:
-            ratingavg = sum(allratings) / len(allratings)
+        all_ratings = cursor.fetchall()
+        list_items(all_ratings)
+        if len(all_ratings) > 1:
+            rating_avg = sum(all_ratings) / len(all_ratings)
         else:
-            ratingavg = 0
+            rating_avg = 0
+        popularity = len(all_ratings)
         cursor = get_db().cursor()
-        sql = "UPDATE items SET rating = ? WHERE id = ?"
-        cursor.execute(sql, (ratingavg, number))
+        sql = "UPDATE items SET rating = ?, popularity = ? WHERE id = ?"
+        cursor.execute(sql, (rating_avg, popularity, number))
         get_db().commit()
 
 
@@ -299,7 +300,7 @@ def home():
     topics = cursor.fetchall()
     for i, topic in enumerate(topics):
         cursor = get_db().cursor()
-        sql = "SELECT name FROM items WHERE topicid = ? ORDER BY rating DESC LIMIT 8;"
+        sql = "SELECT name FROM items WHERE topicid = ? ORDER BY popularity DESC, rating DESC LIMIT 8;"
         cursor.execute(sql, (topic[4], ))
         items = cursor.fetchall()
         topic = topic + (tuple(list_items(items)), )
@@ -526,7 +527,7 @@ def account():
     topics = cursor.fetchall()
     for i, topic in enumerate(topics):
         cursor = get_db().cursor()
-        sql = "SELECT name FROM items WHERE topicid = ? ORDER BY rating DESC LIMIT 8;"
+        sql = "SELECT name FROM items WHERE topicid = ? ORDER BY popularity DESC, rating DESC LIMIT 8;"
         cursor.execute(sql, (topic[4], ))
         items = cursor.fetchall()
         topic = topic + (tuple(list_items(items)), )
@@ -763,7 +764,7 @@ def topic(topicid):
     cursor.execute(sql, (topicid, ))
     topics = cursor.fetchall()
     cursor = get_db().cursor()
-    sql = "SELECT id, name, rating, userid FROM items WHERE topicid = ? ORDER BY rating DESC"
+    sql = "SELECT id, name, rating, userid FROM items WHERE topicid = ? ORDER BY popularity DESC, rating DESC"
     cursor.execute(sql, (topicid, ))
     items = cursor.fetchall()
     cursor = get_db().cursor()
@@ -846,8 +847,8 @@ def additem():
     error = "none"
     if name in previousnames:
         error = "Item name is already in use"
-    elif character_limit(name, 30) != "none":
-        error = character_limit(name, 30)
+    elif character_limit(name, 69) != "none":
+        error = character_limit(name, 69)
     elif empty(name, "n item name") != "none":
         error = empty(name, "n item name")
     if error == "none":
