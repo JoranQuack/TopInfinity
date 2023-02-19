@@ -26,7 +26,7 @@ mail = Mail(app)
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024
 app.config['UPLOAD_EXTENSIONS'] = ['.jpeg', '.jpg', '.png', '.gif', '.JPG']
-allowed_ratings = ["1", "2", "3", "4", "5"]
+ALLOWED_RATINGS = ["1", "2", "3", "4", "5"]
 
 
 # GET KEYS FROM HIDDEN .ENV FILE (NOT ON GITHUB)
@@ -38,7 +38,7 @@ app.secret_key = os.getenv('SECRETKEY')
 #set up emailing system
 email_sender = 'noreplytopinfinity@gmail.com'
 email_password = os.getenv('PASSWORD')
-ALLOWED_DOMAINS = ["gmail", "yahoo", "burnside", "hotmail", "aol", "msn", "outlook", "live", "icloud"]
+ALLOWED_DOMAINS = ["gmail", "yahoo", "burnside", "hotmail", "aol", "msn", "outlook", "live", "icloud", "densem"]
 
 
 
@@ -300,7 +300,7 @@ def home():
     topics = cursor.fetchall()
     for i, topic in enumerate(topics):
         cursor = get_db().cursor()
-        sql = "SELECT name FROM items WHERE topicid = ? ORDER BY popularity DESC, rating DESC LIMIT 8;"
+        sql = "SELECT name FROM items WHERE topicid = ? ORDER BY rating DESC LIMIT 8;"
         cursor.execute(sql, (topic[4], ))
         items = cursor.fetchall()
         topic = topic + (tuple(list_items(items)), )
@@ -446,7 +446,7 @@ def signup_post():
     today = int(date.today().strftime("%Y%m%d"))
     state = str(today) + str(key)
     cursor = get_db().cursor()
-    sql = "INSERT INTO users(username, password, pfp, email, color) VALUES(?,?,?,?,?)"
+    sql = "INSERT INTO users(username, password, pfp, email, state) VALUES(?,?,?,?,?)"
     cursor.execute(sql, (username, password, "default.png", email, state))
     get_db().commit()
 
@@ -473,7 +473,7 @@ def confirm(key):
 
     # search for the key on the database
     cursor = get_db().cursor()
-    sql = "SELECT * FROM users WHERE color = ?"
+    sql = "SELECT * FROM users WHERE state = ?"
     cursor.execute(sql, (key, ))
     userinfo = cursor.fetchall()
 
@@ -508,7 +508,7 @@ def confirm(key):
 
     # confirm account by changing colour back to default
     cursor = get_db().cursor()
-    sql = "UPDATE users SET color = ? WHERE id = ?"
+    sql = "UPDATE users SET state = ? WHERE id = ?"
     cursor.execute(sql, (session['color'], session['userid']))
     get_db().commit()
     session['message'] = "Email has been verified"
@@ -527,7 +527,7 @@ def account():
     topics = cursor.fetchall()
     for i, topic in enumerate(topics):
         cursor = get_db().cursor()
-        sql = "SELECT name FROM items WHERE topicid = ? ORDER BY popularity DESC, rating DESC LIMIT 8;"
+        sql = "SELECT name FROM items WHERE topicid = ? ORDER BY rating DESC LIMIT 8;"
         cursor.execute(sql, (topic[4], ))
         items = cursor.fetchall()
         topic = topic + (tuple(list_items(items)), )
@@ -764,7 +764,7 @@ def topic(topicid):
     cursor.execute(sql, (topicid, ))
     topics = cursor.fetchall()
     cursor = get_db().cursor()
-    sql = "SELECT id, name, rating, userid FROM items WHERE topicid = ? ORDER BY popularity DESC, rating DESC"
+    sql = "SELECT id, name, rating, userid FROM items WHERE topicid = ? ORDER BY rating DESC"
     cursor.execute(sql, (topicid, ))
     items = cursor.fetchall()
     cursor = get_db().cursor()
@@ -803,7 +803,7 @@ def rate(itemid):
     # organise variables and get previous ratings if there are any
     formrating = f"rating.{itemid}"
     rating = request.form[formrating]
-    if rating not in allowed_ratings:
+    if rating not in ALLOWED_RATINGS:
         return redirect('checkcreds')
     cursor = get_db().cursor()
     sql = "SELECT * FROM user_ratings WHERE itemid = ? AND userid = ?"
@@ -872,7 +872,7 @@ def colorchange(hex):
 
     # make sure that the user isn't unverified
     cursor = get_db().cursor()
-    sql = "SELECT color FROM users WHERE id = ?"
+    sql = "SELECT state FROM users WHERE id = ?"
     cursor.execute(sql, (session['userid'], ))
     state = cursor.fetchall()
     if len(state[0][0]) == 17:
@@ -883,7 +883,7 @@ def colorchange(hex):
 
     # store their preference with their user in db
     cursor = get_db().cursor()
-    sql = "UPDATE users SET color = ? WHERE id = ?"
+    sql = "UPDATE users SET state = ? WHERE id = ?"
     cursor.execute(sql, (hex, session['userid']))
     get_db().commit()
     return redirect(url_for('account'))
@@ -922,7 +922,7 @@ def cleanup():
 
     # remove unconfirmed accounts from the database
     cursor = get_db().cursor()
-    sql = "SELECT id, color FROM users"
+    sql = "SELECT id, state FROM users"
     cursor.execute(sql)
     users = cursor.fetchall()
     for user in users:
